@@ -1,0 +1,32 @@
+#!/bin/bash
+
+usage='gitFiles [-h] [dir ...]
+Run git ls-tree and generate list of files under git using the current working
+or specified directories.
+
+Options:
+  -h or -help - print this message'
+
+while [[ $1 == -* ]] ; do
+    opt=$1
+    shift
+    case "$opt" in 
+        -h) echo "$usage" 1>&2
+            exit 1 ;;
+        *)  echo "Error: invalid option: $opt" 1>&2
+            echo "$usage" 1>&2
+            exit 1 ;;
+    esac
+done
+
+if git --version > /dev/null 2>&1
+then
+    if  git rev-parse --git-dir > /dev/null 2>&1
+    then
+        git ls-tree -r --name-only HEAD "$@"
+    else
+        find "$@"
+    fi
+else
+    find "$@"
+fi

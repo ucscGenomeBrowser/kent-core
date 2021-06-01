@@ -1,0 +1,6 @@
+stanzas	35
+depth	4
+tags	137
+storm	2252
+types	23
+fields	access,age,age_units,assay,biosample_date,donor,drug.[].dose,drug.[].expense,drug.[].name,file,format,lab,lab_kent_disassociation_protocol,lab_kent_quality,life_stage,map_ratio,organ,part,person.[].name,person.[].state,pmid,q,sex

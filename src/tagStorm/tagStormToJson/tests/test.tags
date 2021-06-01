@@ -1,0 +1,20 @@
+campus ucsc
+
+    college oaks
+    students 250
+
+    college eight
+    hasFood 1
+    students 350
+
+    college nine
+    hasParking No
+    students 120
+
+campus ucb
+	
+	college letters and sciences
+	students 20000
+
+	college engineering
+	students 10000
