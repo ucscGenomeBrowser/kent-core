@@ -17,7 +17,9 @@ topLibs:
 	@./checkUmask.sh
 	@MACHTYPE=${MACHTYPE} ./machTest.sh
 	cd lib && ${MAKE}
+ifneq ($(wildcard hg/jkOwnLib/makefile),)
 	cd jkOwnLib && ${MAKE}
+endif
 	cd parasol/lib && ${MAKE}
 	cd htslib && ${MAKE}
 

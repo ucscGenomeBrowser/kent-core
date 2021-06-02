@@ -241,6 +241,9 @@ utils: $(APPS:%=%.utils)
 %.utils: hgLib
 	cd $* && echo $* && $(MAKE)
 
+core-utils: 
+
+
 # Compile only, the cgi's for those builds without write access
 #	to apache cgi-bin directories  (this compiles and links executables)
 
