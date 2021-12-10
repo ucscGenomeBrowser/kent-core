@@ -8,7 +8,7 @@ If you run into problems, please open a ticket or contact genome@soe.ucsc.edu.
 
 If you want to file issues or pull-requests, please do that at the original repo, at 
 https://github.com/ucscGenomeBrowser/kent/, not here. The changes will get merged into 
-this repository automatically with the next release (see kent/build/kent-core/).
+this repository automatically on the next sync (see kent/build/kent-core/).
 
 You can find short descriptions for most tools here:
 http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/FOOTER.txt
