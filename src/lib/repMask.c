@@ -3,12 +3,14 @@
  * representation of objects. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "sqlList.h"
 #include "sqlNum.h"
 #include "repMask.h"
+#include "net.h"
+#include "linefile.h"
 
 
 void repeatMaskOutStaticLoad(char **row, struct repeatMaskOut *ret)
@@ -171,3 +173,31 @@ if (sep == ',') fputc('"',f);
 fputc(lastSep,f);
 }
 
+struct lineFile *rmskLineFileOpen(char *fileName)
+/* open a repeat masker .out file or die trying */
+{
+struct lineFile *lf;
+char *line;
+int lineSize;
+
+if (udcIsLocal(fileName))
+  lf = lineFileOpen(fileName, TRUE);
+else
+  lf = netLineFileOpen(fileName);
+
+if (!lineFileNext(lf, &line, &lineSize))
+    errAbort("Empty %s", lf->fileName);
+
+if (!(startsWith("   SW  perc perc", line) ||
+      startsWith("   SW   perc perc", line) ||
+      startsWith("    SW   perc perc", line) ||
+      startsWith("  bit   perc perc", line)))
+    {
+    errAbort("%s doesn't seem to be a RepeatMasker .out file, first "
+             "line seen:\n%s", lf->fileName, line);
+    }
+lineFileNext(lf, &line, &lineSize);
+lineFileNext(lf, &line, &lineSize);
+
+return lf;
+}

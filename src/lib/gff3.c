@@ -5,7 +5,7 @@
  */
 
 /* Copyright (C) 2014 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "gff3.h"
 #include <limits.h>
@@ -46,10 +46,17 @@ char *gff3AttrIsCircular = "Is_circular";
 /* commonly used features names */
 char *gff3FeatGene = "gene";
 char *gff3FeatPseudogene = "pseudogene";
+char *gff3FeatNCRnaGene ="ncRNA_gene";
 char *gff3FeatNCRna ="ncRNA";
 char *gff3FeatRRna = "rRNA";
 char *gff3FeatTRna = "tRNA";
 char *gff3FeatMRna = "mRNA";
+char *gff3FeatLncRna = "lnc_RNA";
+char *gff3FeatPseudogenicTranscript = "pseudogenic_transcript";
+char *gff3FeatScRna = "scRNA";
+char *gff3FeatSnRna = "snRNA";
+char *gff3FeatSnoRna = "snoRNA";
+char *gff3FeatUnconfirmedTranscript = "unconfirmed_transcript";
 char *gff3FeatExon = "exon";
 char *gff3FeatCDS = "CDS";
 char *gff3FeatThreePrimeUTR = "three_prime_UTR";

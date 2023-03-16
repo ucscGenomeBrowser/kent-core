@@ -1,7 +1,7 @@
 /* twoBitToFa - Convert all or part of twoBit file to fasta. */
 
 /* Copyright (C) 2013 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "linefile.h"
 #include "hash.h"
@@ -36,8 +36,6 @@ errAbort(
   "\n"
   "Sequence and range may also be specified as part of the input\n"
   "file name using the syntax:\n"
-  "      /path/input.2bit:name\n"
-  "   or\n"
   "      /path/input.2bit:name\n"
   "   or\n"
   "      /path/input.2bit:name:start-end\n"

@@ -1,7 +1,7 @@
 /* bigBedToBed - Convert from bigBed to ascii bed format.. */
 
 /* Copyright (C) 2014 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "linefile.h"
 #include "hash.h"
@@ -9,13 +9,16 @@
 #include "localmem.h"
 #include "udc.h"
 #include "bigBed.h"
+#include "asParse.h"
 #include "obscure.h"
+#include "bigBedCmdSupport.h"
 
 
 char *clChrom = NULL;
 int clStart = -1;
 int clEnd = -1;
 int maxItems = 0;
+boolean header = FALSE;
 
 void usage()
 /* Explain usage and exit. */
@@ -30,6 +33,7 @@ errAbort(
   "   -end=N - if set, restict output to only that under end\n"
   "   -maxItems=N - if set, restrict output to first N items\n"
   "   -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs\n"
+  "   -header - output a autoSql-style header (starts with '#').\n"
   );
 }
 
@@ -39,14 +43,18 @@ static struct optionSpec options[] = {
    {"end", OPTION_INT},
    {"maxItems", OPTION_INT},
    {"udcDir", OPTION_STRING},
+   {"header", OPTION_BOOLEAN},
    {NULL, 0},
 };
+
 
 void bigBedToBed(char *inFile, char *outFile)
 /* bigBedToBed - Convert from bigBed to ascii bed format.. */
 {
 struct bbiFile *bbi = bigBedFileOpen(inFile);
 FILE *f = mustOpen(outFile, "w");
+if (header)
+    bigBedCmdOutputHeader(bbi, f);
 struct bbiChromInfo *chrom, *chromList = bbiChromList(bbi);
 int itemCount = 0;
 for (chrom = chromList; chrom != NULL; chrom = chrom->next)
@@ -94,6 +102,7 @@ clStart = optionInt("start", clStart);
 clEnd = optionInt("end", clEnd);
 maxItems = optionInt("maxItems", maxItems);
 udcSetDefaultDir(optionVal("udcDir", udcDefaultDir()));
+header = optionExists("header");
 if (argc != 3)
     usage();
 bigBedToBed(argv[1], argv[2]);

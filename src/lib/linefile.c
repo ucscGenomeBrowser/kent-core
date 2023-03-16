@@ -146,7 +146,7 @@ testName=getFileNameFromHdrSig(testbytes);
 freez(&testbytes);
 if (!testName)
     return NULL;  /* avoid error from pipeline */
-pl = pipelineOpen1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, fileName, NULL);
+pl = pipelineOpen1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, fileName, NULL, 0);
 lf = lineFileAttach(fileName, zTerm, pipelineFd(pl));
 lf->pl = pl;
 return lf;
@@ -157,7 +157,7 @@ struct lineFile *lineFileDecompressFd(char *name, bool zTerm, int fd)
 {
 struct pipeline *pl;
 struct lineFile *lf;
-pl = pipelineOpenFd1(getDecompressor(name), pipelineRead|pipelineSigpipe, fd, STDERR_FILENO);
+pl = pipelineOpenFd1(getDecompressor(name), pipelineRead|pipelineSigpipe, fd, STDERR_FILENO, 0);
 lf = lineFileAttach(name, zTerm, pipelineFd(pl));
 lf->pl = pl;
 return lf;
@@ -173,7 +173,7 @@ struct lineFile *lf;
 char *fileName = getFileNameFromHdrSig(mem);
 if (fileName==NULL)
   return NULL;
-pl = pipelineOpenMem1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, mem, size, STDERR_FILENO);
+pl = pipelineOpenMem1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, mem, size, STDERR_FILENO, 0);
 lf = lineFileAttach(fileName, zTerm, pipelineFd(pl));
 lf->pl = pl;
 return lf;
@@ -642,16 +642,8 @@ while (!gotLf)
 
     if (!gotLf && bytesInBuf == lf->bufSize)
         {
-	if (bufSize >= 512*1024*1024)
-	    {
-	    errAbort("Line too long (more than %d chars) line %d of %s",
-		lf->bufSize, lf->lineIx+1, lf->fileName);
-	    }
-	else
-	    {
-	    lineFileExpandBuf(lf, bufSize*2);
-	    buf = lf->buf;
-	    }
+        lineFileExpandBuf(lf, bufSize*2);
+        buf = lf->buf;
 	}
     }
 
@@ -1291,7 +1283,7 @@ boolean lineFileParseHttpHeader(struct lineFile *lf, char **hdr,
 /* Extract HTTP response header from lf into hdr, tell if it's
  * "Transfer-Encoding: chunked" or if it has a contentLength. */
 {
-  struct dyString *header = newDyString(1024);
+  struct dyString *header = dyStringNew(1024);
   char *line;
   int lineSize;
 
@@ -1368,7 +1360,7 @@ struct dyString *lineFileSlurpHttpBody(struct lineFile *lf,
 /* Return a dyString that contains the http response body in lf.  Handle
  * chunk-encoding and content-length. */
 {
-  struct dyString *body = newDyString(64*1024);
+  struct dyString *body = dyStringNew(64*1024);
   char *line;
   int lineSize;
 

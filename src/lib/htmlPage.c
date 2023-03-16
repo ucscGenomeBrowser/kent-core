@@ -1,5 +1,5 @@
 /* Copyright (C) 2014 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 /* htmlPage - stuff to read, parse, and submit  htmlPages and forms. 
  *
@@ -765,7 +765,8 @@ for (tag = form->startTag->next; tag != form->endTag; tag = tag->next)
 	var->type = type;
 	if (sameWord(type, "TEXT") || sameWord(type, "PASSWORD") 
 		|| sameWord(type, "FILE") || sameWord(type, "HIDDEN")
-		|| sameWord(type, "IMAGE") || sameWord(type, "SEARCH"))
+		|| sameWord(type, "IMAGE") || sameWord(type, "SEARCH")
+                || sameWord(type, "COLOR"))
 	    {
 	    var->curVal = cloneString(value);
 	    }
@@ -1322,7 +1323,7 @@ char *htmlFormCgiVars(struct htmlPage *page, struct htmlForm *form,
 /* Return cgi vars in name=val format from use having pressed
  * submit button of given name and value. */
 {
-struct dyString *dy = newDyString(0);
+struct dyString *dy = dyStringNew(0);
 struct htmlFormVar *var;
 boolean isMime = isMimeEncoded(form);
 int mimeParts = 0;

@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/root/browserLogs/scripts/trashCleanMonitor.sh /root/browserLogs/scripts/virtualBox.txt searchAndDestroy

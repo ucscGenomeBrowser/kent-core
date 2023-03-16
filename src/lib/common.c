@@ -64,6 +64,19 @@ newBuf[len] = 0;
 return newBuf;
 }
 
+char *catThreeStrings(char *a, char *b, char *c)
+/* Allocate new string that is a concatenation of three strings. */
+{
+int aLen = strlen(a), bLen = strlen(b), cLen = strlen(c);
+int len = aLen + bLen + cLen; 
+char *newBuf = needLargeMem(len+1);
+memcpy(newBuf, a, aLen);
+memcpy(newBuf+aLen, b, bLen);
+memcpy(newBuf+aLen+bLen, c, cLen);
+newBuf[len] = 0;
+return newBuf;
+}
+
 /* Reverse the order of the bytes. */
 void reverseBytes(char *bytes, long length)
 {
@@ -326,6 +339,21 @@ while (next != NULL)
     freeMem((char*)el);
     }
 *ppt = NULL;
+}
+
+void slFreeListWithFunc(void *listPt, void (*freeFunc)())
+/* Free a list by calling freeFunc on each element.
+ * listPt must be a pointer to a pointer to some slList-compatible struct (&list).
+ * freeFunc must take one arg: a pointer to a pointer to the item it is going to free. */
+{
+struct slList **pList = (struct slList**)listPt;
+struct slList *el, *next;
+for (el = *pList; el != NULL; el = next)
+    {
+    next = el->next;
+    freeFunc(&el);
+    }
+*pList = NULL;
 }
 
 void slSort(void *pList, int (*compare )(const void *elem1,  const void *elem2))
@@ -696,6 +724,15 @@ const struct slName *b = *((struct slName **)vb);
 return cmpStringsWithEmbeddedNumbers(a->name, b->name);
 }
 
+int slNameCmpWordsWithEmbeddedNumbers(const void *va, const void *vb)
+/* Compare strings such as gene names that may have embedded numbers,
+ * in a string sensitive way so that bmp4a comes before bmp14a 
+ * and ABc and abC are treated as the same.  A little slow. */
+{
+const struct slName *a = *((struct slName **)va);
+const struct slName *b = *((struct slName **)vb);
+return cmpWordsWithEmbeddedNumbers(a->name, b->name);
+}
 
 
 void slNameSort(struct slName **pList)
@@ -1321,6 +1358,15 @@ void slPairSortCase(struct slPair **pList)
 /* Sort slPair list, ignore case. */
 {
 slSort(pList, slPairCmpCase);
+}
+
+int slPairCmpWordsWithEmbeddedNumbers(const void *va, const void *vb)
+/* Sort slPairList ignoring case and dealing with embedded numbers so 2 comes
+ * before 10, not after. */
+{
+const struct slPair *a = *((struct slPair **)va);
+const struct slPair *b = *((struct slPair **)vb);
+return cmpWordsWithEmbeddedNumbers(a->name, b->name);
 }
 
 int slPairCmp(const void *va, const void *vb)
@@ -2824,9 +2870,10 @@ void mustReadFd(int fd, void *buf, size_t size)
 ssize_t actualSize;
 char *cbuf = buf;
 // using a loop because linux was not returning all data in a single request when request size exceeded 2GB.
+// MacOS complains invalid argument if it is over 2GB
 while (size > 0)
     {
-    actualSize = read(fd, cbuf, size);
+    actualSize = read(fd, cbuf, min(0x7FFF000,size));  // max 2GB 0x7FFF000 MAX_RW_COUNT = (INT_MAX & PAGE_MASK)
     if (actualSize < 0)
 	errnoAbort("Error reading %lld bytes", (long long)size);
     if (actualSize == 0)
@@ -3608,6 +3655,24 @@ lastTime = time;
 va_end(args);
 }
 
+void uglyt(char *label, ...)
+/* Print label and how long it's been since last call.  Call with
+ * a NULL label to initialize. */
+{
+static long lastTime = 0;
+long time = clock1000();
+if (label != NULL)
+    {
+    va_list args;
+    va_start(args, label);
+    vfprintf(stdout, label, args);
+    fprintf(stdout, ": %ld ms\n", time - lastTime);
+    lastTime = time;
+    va_end(args);
+    }
+}
+
+
 void makeDirs(char* path)
 /* make a directory, including parent directories */
 {
@@ -3691,28 +3756,13 @@ while ((c = *s++) != 0)
 return TRUE;
 }
 
-time_t mktimeFromUtc (struct tm *t)
-/* Return time_t for tm in UTC (GMT)
- * Useful for stuff like converting to time_t the
- * last-modified HTTP response header
- * which is always GMT. Returns -1 on failure of mktime */
+
+time_t mktimeFromUtc(struct tm *tm)
+// convert UTC time to UTC time_t 
+// The timegm function is available on Linux and BSD and MacOS/Darwin
+// This is thread-safe and avoids setenv
 {
-    time_t time;
-    char *tz;
-    char save_tz[100];
-    tz=getenv("TZ");
-    if (tz)
-        safecpy(save_tz, sizeof(save_tz), tz);
-    setenv("TZ", "GMT0", 1);
-    tzset();
-    t->tm_isdst = 0;
-    time=mktime(t);
-    if (tz)
-        setenv("TZ", save_tz, 1);
-    else
-        unsetenv("TZ");
-    tzset();
-    return (time);
+return timegm(tm);
 }
 
 

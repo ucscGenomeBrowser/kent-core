@@ -70,7 +70,10 @@ UTILS_APPLIST = \
 	findMotif \
 	headRest \
 	htmlCheck \
+	matrixClusterColumns \
 	matrixMarketToTsv \
+	matrixNormalize \
+	matrixToBarChartBed \
 	newProg \
 	newPythonProg \
 	nibFrag \
@@ -153,7 +156,6 @@ UCSC_APPS = \
 	verticalSplitSqlTable \
 	weedLines
 
-
 # list of scripts to install
 
 USER_APP_SCRIPTS = \
@@ -165,7 +167,8 @@ USER_APP_SCRIPTS = \
 	tdbSort \
 	webSync \
 	chromToUcsc \
-	bigHeat
+	bigHeat \
+	bigGuessDb
 
 SCRIPT_FILES = \
 	agpToLift \
@@ -206,6 +209,8 @@ SCRIPT_FILES = \
 	bedAppendPaperInfo \
 	googleSheetToBigBed \
 	doClinvarLift \
+	hubPublicMail \
+	browserRace \
 	${USER_APP_SCRIPTS}
 
 # List of all directories to build
@@ -214,7 +219,7 @@ ALL_APPS = $(UTILS_APPLIST) $(UCSC_APPS)
 
 # all: builds all utilities here
 
-all: $(ALL_APPS:%=%.all)
+all: $(ALL_APPS:%=%.all) $(USER_APP_SCRIPTS:%=%.userAppScript)
 
 %.all:
 	cd $* && echo $* && $(MAKE)

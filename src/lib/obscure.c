@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include <unistd.h>
+#include <sys/syscall.h>
 #include "portable.h"
 #include "localmem.h"
 #include "hash.h"
@@ -78,6 +79,8 @@ carefulClose(&f);
 void readInGulp(char *fileName, char **retBuf, size_t *retSize)
 /* Read whole file in one big gulp. */
 {
+if (fileExists(fileName) && !isRegularFile(fileName))
+    errAbort("can only read regular files with readInGulp: %s", fileName);
 size_t size = (size_t)fileSize(fileName);
 char *buf;
 FILE *f = mustOpen(fileName, "rb");
@@ -157,8 +160,14 @@ struct lineFile *lf = lineFileOpen(fileName, TRUE);
 struct hash *hash = hashNew(16);
 char *row[3];
 int fields = 0;
-while ((fields = lineFileChop(lf, row)) != 0)
+// Try tab-separated first; if no tabs, then try whitespace-separated.
+while ((fields = lineFileChopTab(lf, row)) != 0)
     {
+    if (fields == 1)
+        {
+        char *line = row[0];
+        fields = chopLine(line, row);
+        }
     lineFileExpectWords(lf, 2, fields);
     char *name = row[0];
     char *value = lmCloneString(hash->lm, row[1]);
@@ -561,7 +570,7 @@ struct slName *stringToSlNames(char *string)
 {
 struct slName *list = NULL, *name;
 char *dupe = cloneString(string);
-char c, *s = dupe, *e;
+char c, *s = dupe, *e = NULL;
 
 for (;;)
     {
@@ -885,6 +894,12 @@ if (--dot <= 0)
     }
 }
 
+void dotForUserEnd()
+/* Write out new line at end of dots for user */
+{
+putc('\n', stderr);
+}
+
 void spaceToUnderbar(char *s)
 /* Convert white space to underbar. */
 {
@@ -1031,4 +1046,19 @@ if (f)
 return ret;
 }
 
-
+int get_thread_id() {
+/* return some int specific to a thread, copied from https://stackoverflow.com/questions/21091000/how-to-get-thread-id-of-a-pthread-in-linux-c-program */
+#if defined(__linux__)
+    return syscall(SYS_gettid);
+#elif defined(__FreeBSD__)
+    long tid;
+    thr_self(&tid);
+    return (int)tid;
+#elif defined(__NetBSD__)
+    return _lwp_self();
+#elif defined(__OpenBSD__)
+    return getthrid();
+#else
+    return getpid();
+#endif
+}

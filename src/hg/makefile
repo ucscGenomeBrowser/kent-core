@@ -11,7 +11,7 @@ BROWSER_BINS=cartReset das hgBlat makeDb/hgCgiData hgCollection hgConvert \
 	encode/hgEncodeDataVersions encode/hgEncodeVocab encode/hgEncodeApi \
 	phyloPng hgCustom hgPal hgFileUi hgFileSearch makeDb/hgCgiData \
 	js htdocs/style hgMirror hgBeacon hgGtexTrackSettings pyLib \
-	hgGeneGraph hgs hubApi hgPhyloPlace
+	hgGeneGraph hgs hubApi hgPhyloPlace gar hgSearch
 
 ifdef LOWELAB
     BROWSER_BINS += $(HOME)/lowelab/src/browser/tooltip $(HOME)/lowelab/src/browser/chooseorg
@@ -24,7 +24,7 @@ ifneq ($(findstring $(shell hostname),hgwdev hgwbeta),)
 endif
 
 
-TEST_DIRS = lib autoDtd autoSql blastToPsl checkTableCoords embossToPsl \
+TEST_DIRS = lib cgilib autoDtd autoSql blastToPsl checkTableCoords embossToPsl \
             genePredSingleCover genePredHisto genePredToBed genePredToGtf \
 	    genePredToMafFrames gbGetEntries hgGetAnn liftAcross liftOver \
             mouseStuff mrnaToGene pslCDnaFilter pslDiff pslHisto \
@@ -105,6 +105,8 @@ UTILS_APPLIST = \
 	pslSelect \
 	pslSomeRecords \
 	pslSort \
+	pslSortAcc \
+	pslSplitOnTarget \
 	pslStats \
 	pslToBed \
 	pslToChain \
@@ -227,6 +229,7 @@ all::    cgi utils
 
 hgLib:
 	cd lib && ${MAKE}
+	cd cgilib && ${MAKE}
 
 userApps: $(UTILS_APPLIST:%=%.userApp)
 	cd altSplice/lib && $(MAKE)
@@ -240,9 +243,6 @@ userApps: $(UTILS_APPLIST:%=%.userApp)
 utils: $(APPS:%=%.utils)
 %.utils: hgLib
 	cd $* && echo $* && $(MAKE)
-
-core-utils: 
-
 
 # Compile only, the cgi's for those builds without write access
 #	to apache cgi-bin directories  (this compiles and links executables)

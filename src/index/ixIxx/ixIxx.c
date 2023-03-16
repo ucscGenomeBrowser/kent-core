@@ -9,8 +9,11 @@
 
 
 /* Variables that can be set from command line. */
-int prefixSize = trixPrefixSize;
+int prefixSize;
 int binSize = 64*1024;
+
+int maxFailedWordLength = 0;
+int maxWordLength = 31;
 
 void usage()
 /* Explain usage and exit. */
@@ -24,60 +27,18 @@ errAbort(
   "options:\n"
   "   -prefixSize=N Size of prefix to index on in ixx.  Default is 5.\n"
   "   -binSize=N Size of bins in ixx.  Default is 64k.\n"
+  "   -maxWordLength=N Maximum allowed word length. \n"
+  "     Words with more characters than this limit are ignored and will not appear in index or be searchable.  Default is %d.\n"
+    , maxWordLength
   );
 }
 
 static struct optionSpec options[] = {
    {"prefixSize", OPTION_INT},
    {"binSize", OPTION_INT},
+   {"maxWordLength", OPTION_INT},
    {NULL, 0},
 };
-
-bool wordMiddleChars[256];  /* Characters that may be part of a word. */
-bool wordBeginChars[256];
-
-void initCharTables()
-/* Initialize tables that describe characters. */
-{
-int c;
-for (c=0; c<256; ++c)
-    if (isalnum(c))
-       wordBeginChars[c] = wordMiddleChars[c] = TRUE;
-wordBeginChars['_'] = wordMiddleChars['_'] = TRUE;
-wordMiddleChars['.'] = TRUE;
-wordMiddleChars['-'] = TRUE;
-}
-
-
-char *skipToWord(char *s)
-/* Skip to next word character.  Return NULL at end of string. */
-{
-unsigned char c;
-while ((c = *s) != 0)
-    {
-    if (wordBeginChars[c])
-        return s;
-    s += 1;
-    }
-return NULL;
-}
-
-char *skipOutWord(char *start)
-/* Skip to next non-word character.  Returns empty string at end. */
-{
-char *s = start;
-unsigned char c;
-while ((c = *s) != 0)
-    {
-    if (!wordMiddleChars[c])
-        break;
-    s += 1;
-    }
-while (s > start && !wordBeginChars[(int)(s[-1])])
-    s -= 1;
-return s;
-}
-
 
 struct wordPos
 /* Word position. */
@@ -99,16 +60,17 @@ if (dif == 0)
 return dif;
 }
 
-void indexWords(struct hash *wordHash, 
-	char *itemId, char *text, struct hash *itemIdHash)
+int indexWords(struct hash *wordHash, 
+	char *itemId, char *text, struct hash *itemIdHash, struct hash *failedWordHash)
 /* Index words in text and store in hash. */
 {
 char *s, *e = text;
-char word[32];
+char word[maxWordLength+1];
 int len;
 struct hashEl *hel;
 struct wordPos *pos;
 int wordIx;
+int failedCount = 0;
 
 tolowers(text);
 itemId = hashStoreName(itemIdHash, itemId);
@@ -132,7 +94,21 @@ for (wordIx=1; ; ++wordIx)
 	pos->next = hel->val;
 	hel->val = pos;
 	}
+    else
+	{
+        char *failedWord=cloneStringZ(s,len);
+	hel = hashLookup(failedWordHash, failedWord);
+	if (hel == NULL)
+	    {
+	    hashAdd(failedWordHash, failedWord, NULL);
+	    verbose(2, "word [%s] length %d is longer than max length %d.\n", failedWord, len, maxWordLength);
+	    ++failedCount;
+            maxFailedWordLength = max(len, maxFailedWordLength);
+	    }
+        freez(&failedWord);
+	}
     }
+return failedCount;
 }
 
 void writeIndexHash(struct hash *wordHash, char *fileName)
@@ -160,17 +136,23 @@ void makeIx(char *inFile, char *outIndex)
 /* Create an index file. */
 {
 struct lineFile *lf = lineFileOpen(inFile, TRUE);
-struct hash *wordHash = newHash(20), *itemIdHash = newHash(20);
+struct hash *wordHash = newHash(20), *failedWordHash = newHash(20), *itemIdHash = newHash(20);
 char *line;
+int failedWordCount = 0;
 initCharTables();
 while (lineFileNextReal(lf, &line))
-     {
-     char *id, *text;
-     id = nextWord(&line);
-     text = skipLeadingSpaces(line);
-     indexWords(wordHash, id, text, itemIdHash);
-     }
+    {
+    char *id, *text;
+    id = nextWord(&line);
+    text = skipLeadingSpaces(line);
+    failedWordCount += indexWords(wordHash, id, text, itemIdHash, failedWordHash);
+    }
 writeIndexHash(wordHash, outIndex);
+if (failedWordCount)
+    {
+    verbose(1, "%d words were longer than limit %d length and were ignored. Run with -verbose=2 to see them.\n", failedWordCount, maxWordLength);
+    verbose(1, "The longest failed word length was %d.\n", maxFailedWordLength);
+    }
 }
 
 void setPrefix(char *word, char *prefix)
@@ -253,8 +235,9 @@ int main(int argc, char *argv[])
 /* Process command line. */
 {
 optionInit(&argc, argv, options);
-prefixSize = optionInt("prefixSize", prefixSize);
+prefixSize = optionInt("prefixSize", trixPrefixSize);
 binSize = optionInt("binSize", binSize);
+maxWordLength = optionInt("maxWordLength", maxWordLength);
 if (argc != 4)
     usage();
 ixIxx(argv[1], argv[2], argv[3]);

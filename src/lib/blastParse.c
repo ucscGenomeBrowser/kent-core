@@ -1,7 +1,7 @@
 /* blastParse - read in blast output into C data structure. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "dystring.h"
@@ -716,8 +716,8 @@ else
  */
 if (qString == NULL)
     {
-    qString = newDyString(50000);
-    tString = newDyString(50000);
+    qString = dyStringNew(50000);
+    tString = dyStringNew(50000);
     }
 clearBlastBlock(bb, qString, tString);
 for (;;)

@@ -1,20 +1,35 @@
 #!/bin/bash
 
 # script to install/setup dependencies for the UCSC genome browser CGIs
-# call it like this as root from a command line: bash browserInstall.sh
+# call it like this as root from a command line: bash browserSetup.sh
 
-# you can easily debug this script with 'bash -x browserInstall.sh', it 
+# you can easily debug this script with 'bash -x browserSetup.sh', it 
 # will show all commands then
+
+exec > >(tee -a "${HOME}/browserSetup.sh") 2>&1
 
 set -u -e -o pipefail # fail on unset vars and all errors, also in pipes
 
-function errorHandler {
+# set all locale settings to English
+# searching for certain strings in command output might fail, if locale is different
+export LANG=C
+
+exitHandler() {
+    if [ "$1" == "100" -o "$1" == "0" ] ; then
+       exit $1 # all fine, a specific error message has already been output
+    fi
+
+    # somehow this script exited with an unknown type of error code
+    echo Exit error $1 occurred on line $2
     echo The UCSC Genome Browser installation script exited with an error.
     echo Please contact us at genome-mirror@soe.ucsc.edu and send us an output log 
     echo of the command prefixed with '"bash -x"', e.g.
     echo 'bash -x browserSetup.sh install 2>&1 > install.log'
 }
-trap errorHandler ERR
+
+# only trap the exit, not the errors 
+# see https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700
+trap 'exitHandler $? $LINENO' EXIT
 
 # ---- GLOBAL DEFAULT SETTINGS ----
 
@@ -495,22 +510,61 @@ function waitKey ()
     echo2
 }
 
+# set MYCNF to the path to my.cnf
+function setMYCNF ()
+{
+    if [ -f /etc/my.cnf.d/mariadb-server.cnf ] ; then
+	# Centos 8 stream: This has to be first, because /etc/my.cnf exists on Centos 8 Stream, but it contains a mysqld section
+        # by default and somehow the section doesn't seem to take effect since a specific [mariadb] section also exists in the mariadb-server.cnf.
+        # As a result, we only modify the mariadb-server config file
+    	MYCNF=/etc/my.cnf.d/mariadb-server.cnf 
+    elif [ -f /etc/mysql/mariadb.conf.d/*-server.cnf ] ; then
+	# Ubuntu with mariadb. Must come before etc/my.cnf
+	MYCNF=/etc/mysql/mariadb.conf.d/*-server.cnf
+    elif [ -f /etc/mysql/mysql.conf.d/mysqld.cnf ] ; then
+	# Ubuntu 16, 18, 20 with mysqld
+    	MYCNF=/etc/mysql/mysql.conf.d/mysqld.cnf
+    elif [ -f /etc/my.cnf ] ; then
+	# generic Centos 6-8
+    	MYCNF=/etc/my.cnf
+    elif [ -f /etc/mysql/my.cnf ] ; then
+        # generic Ubuntu 14
+    	MYCNF=/etc/mysql/my.cnf
+    else
+    	echo Could not find my.cnf. Adapt 'setMYCNF()' in browserSetup.sh and/or contact us.
+    	exit 1
+    fi
+    echo Found Mariadb config file: $MYCNF
+}
+
+function mysqlStrictModeOff () 
+{
+# make sure that missing values in mysql insert statements do not trigger errors, #18368 = deactivate strict mode
+# This must happen before Mariadb is started or alternative Mariadb must be restarted after this has been done
+setMYCNF
+echo Deactivating MySQL strict mode
+sed -Ei '/^.(mysqld|server).$/a sql_mode='  $MYCNF
+}
+
 function mysqlAllowOldPasswords
 # mysql >= 8 does not allow the old passwords anymore. But our client is still compiled
 # with the old, non-SHA256 encryption. So we must deactivate this new feature.
 # What will MariaDB do?
 {
 echo2 'Checking for Mysql version >= 8'
+
 MYSQLMAJ=`mysql -e 'SHOW VARIABLES LIKE "version";' -NB | cut -f2 | cut -d. -f1`
+setMYCNF
 if [ "$MYSQLMAJ" -ge 8 ] ; then
     echo2 'Mysql >= 8 found, checking if default-authentication allows native passwords'
-    if grep -q default-authentication /etc/mysql/my.cnf; then
-        echo2 'default-authentication already set in /etc/mysql/my.cnf'
+    if grep -q default-authentication $MYCNF; then
+        echo2 "default-authentication already set in $MYCNF"
     else
-	echo2 Changing /etc/mysql/my.cnf to allow native passwords and restarting Mysql
-	echo '[mysqld]' >> /etc/mysql/my.cnf
-        echo 'default-authentication-plugin=mysql_native_password' >> /etc/mysql/my.cnf
-	service mysql restart
+	echo2 Changing $MYCNF to allow native passwords and restarting Mysql
+	echo '[mysqld]' >> $MYCNF
+        echo 'default-authentication-plugin=mysql_native_password' >> $MYCNF
+	stopMysql
+	startMysql
     fi
 fi
 }
@@ -640,10 +694,17 @@ function installRedhat () {
     # make sure we have and EPEL and ghostscript and rsync (not installed on vagrant boxes)
     # imagemagick is required for the session gallery
     yum -y update
-    yum -y install epel-release
-    yum -y install ghostscript rsync ImageMagick R-core curl urw-fonts
 
-    # centos 7 and fedora 20 do not provide libpng by default
+    # Fedora doesn't have or need EPEL, however, it does not include chkconfig by default
+    if cat /etc/redhat-release | grep edora > /dev/null; then
+	yum -y install chkconfig
+    else
+        yum -y install epel-release
+    fi
+
+    yum -y install ghostscript rsync ImageMagick R-core curl
+
+    # centos 7 does not provide libpng by default
     if ldconfig -p | grep libpng12.so > /dev/null; then
         echo2 libpng12 found
     else
@@ -666,7 +727,7 @@ function installRedhat () {
         echo2 Apache already installed
     fi
     
-    # download the apache config
+    # create the apache config
     if [ ! -f $APACHECONF ]; then
         echo2
         echo2 Creating the Apache2 config file $APACHECONF
@@ -689,19 +750,21 @@ function installRedhat () {
        service iptables restart
     fi
     
-    # MYSQL INSTALL ON REDHAT, quite involved, as MariaDB is increasingly the default
+    # MYSQL INSTALL ON REDHAT
 
     # centos7 provides only a package called mariadb-server
-    if yum list mysql-server 2> /dev/null ; then
-        MYSQLPKG=mysql-server
-    elif yum list mariadb-server 2> /dev/null ; then
+    # Mysql 8 does not allow copying MYISAM files anymore into the DB. 
+    # -> we cannot support Mysql 8 anymore
+    #if yum list mysql-server 2> /dev/null ; then
+       #MYSQLPKG=mysql-server
+    if yum list mariadb-server 2> /dev/null ; then
         MYSQLPKG=mariadb-server
     else
         echo2 Cannot find a mysql-server package in the current yum repositories
         exit 100
     fi
     
-    # even mariadb packages currently call their binary /usr/bin/mysqld_safe
+    # even mariadb packages currently call their main wrapper /usr/bin/mysqld_safe
     if [ ! -f /usr/bin/mysqld_safe ]; then
         echo2 
         echo2 Installing the Mysql or MariaDB server and make it start at boot.
@@ -720,11 +783,15 @@ function installRedhat () {
         # start mysql on boot
         chkconfig --level 2345 $MYSQLD on 
 
+        # make sure that missing values in Mysql insert statements do not trigger errors, #18368: deactivate strict mode
+        mysqlStrictModeOff
+
         # start mysql now
-        /sbin/service $MYSQLD start
+        startMysql
 
         secureMysql
         SET_MYSQL_ROOT=1
+
     else
         echo2 Mysql already installed
     fi
@@ -735,7 +802,7 @@ function installRedhat () {
             yum -y install MySQL-python
     # Centos 8 defaults to python3 and it does not have a package MySQL-python anymore
     # So we install python2, the mysql libraries and fix up my_config.h manually
-    # This is strange, but I was unable to find a different working solution. MariaDB does not have my_config.h
+    # This is strange, but I was unable to find a different working solution. MariaDB simply does not have my_config.h
     else
             yum install -y python2 mysql-devel python2-devel wget gcc
             if [ -f /usr/include/mysql/my_config.h ]; then
@@ -743,6 +810,22 @@ function installRedhat () {
             else
                 wget https://raw.githubusercontent.com/paulfitz/mysql-connector-c/master/include/my_config.h -P /usr/include/mysql/
             fi
+
+	    # this is very strange, but was necessary on Fedora https://github.com/DefectDojo/django-DefectDojo/issues/407
+            # somehow the mysql.h does not have the "reconnect" field anymore in Fedora
+            if grep -q "bool reconnect;" /usr/include/mysql/mysql.h ; then
+                echo /usr/include/mysql/mysql.h already has reconnect attribute
+            else
+                sed '/st_mysql_options options;/a    my_bool reconnect; // added by UCSC Genome browserSetup.sh script' /usr/include/mysql/mysql.h -i.bkp
+            fi
+
+	    # fedora > 34 doesn't have any pip2 package anymore so install it now
+	    if ! type "pip2" > /dev/null; then
+                 wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+		 python2 get-pip.py
+		 mv /usr/bin/pip /usr/bin/pip2
+
+	    fi
             pip2 install MySQL-python
     fi
 
@@ -760,7 +843,7 @@ function installOsx ()
        echo2 'Please install XCode from https://developer.apple.com/xcode/downloads/'
        echo2 'Start XCode once and accept the Apple license.'
        echo2 'Then run this script again.'
-       exit 101
+       exit 100
    fi
 
    # make sure that the xcode command line tools are installed
@@ -884,10 +967,10 @@ function installOsx ()
 function installDebian ()
 {
     # update repos
-    if [ ! -f /tmp/browserInstall.aptGetUpdateDone ]; then
+    if [ ! -f /tmp/browserSetup.aptGetUpdateDone ]; then
        echo2 Running apt-get update
        apt-get update
-       touch /tmp/browserInstall.aptGetUpdateDone
+       touch /tmp/browserSetup.aptGetUpdateDone
     fi
 
     echo2 Installing ghostscript and imagemagick
@@ -958,15 +1041,13 @@ function installDebian ()
 
         # do not prompt in apt-get, will set an empty mysql root password
         export DEBIAN_FRONTEND=noninteractive
-        apt-get --assume-yes install mysql-server
-        # make sure that missing values do not trigger errors, #18368
-        if [ -f /etc/mysql/mysql.conf.d/mysqld.cnf ]; then
-            # Ubuntu 16
-            sed -i '/^.mysqld.$/a sql_mode=' /etc/mysql/mysql.conf.d/mysqld.cnf
-        else
-            # Ubuntu 14
-            sed -i '/^.mysqld.$/a sql_mode=' /etc/mysql/my.cnf
-        fi
+	# Debian / Ubuntu 20 defaults to Mysql 8 and Mysql 8 does not allow rsync of myisam anymore
+	# -> we require mariaDb now
+        # apt-get --assume-yes install mysql-server
+        apt-get --assume-yes install mariadb-server
+
+        mysqlStrictModeOff
+        startMysql
         # flag so script will set mysql root password later to a random value
         SET_MYSQL_ROOT=1
     fi
@@ -1083,7 +1164,7 @@ function mysqlChangeRootPwd ()
    # paranoia check
    if [[ "$MYSQLROOTPWD" == "" ]]; then
        echo2 Error: could not generate a random Mysql root password
-       exit 111
+       exit 100
    fi
 
    echo2
@@ -1117,7 +1198,7 @@ function mysqlChangeRootPwd ()
        echo2 user=root
        echo2 password=PASSWORD
        echo2 run chmod 600 ~/.my.cnf and restart this script.
-       exit 123
+       exit 100
    fi
 }
 
@@ -1147,7 +1228,9 @@ else
     fi
        
     echo2 "Then run this script again."
-    exit 200
+    echo2 'If this is a fresh docker image or blank VM, you can also remove Mariadb entirely, run "rm -rf /var/lib/mysql/*"'
+    echo2 "and rm -f ${HOME}/.my.cnf and then rerun this script. It will then reinstall Mariadb and define new passwords."
+    exit 100
 fi
 }
    
@@ -1193,7 +1276,6 @@ function mysqlDbSetup ()
     # -------------------
     # Mysql db setup
     # -------------------
-    mysqlAllowOldPasswords
 
     echo2
     echo2 Creating Mysql databases customTrash, hgTemp and hgcentral
@@ -1215,10 +1297,23 @@ function mysqlDbSetup ()
     #  Full access to all databases for the user 'browser'
     #       This would be for browser developers that need read/write access
     #       to all database tables.  
-    #$MYSQL -e "DROP USER IF EXISTS browser@localhost"
-    #$MYSQL -e "CREATE USER browser@localhost "
+
+    mysqlVer=`mysql -e 'SHOW VARIABLES LIKE "version";' -NB | cut -f2 | cut -d- -f1 | cut -d. -f-2`
+    if [[ $mysqlVer == "5.6" || $mysqlVer == "5.5" ]] ; then
+       # centos7 uses mysql 5.5 or 5.6 which doesn't have IF EXISTS so work around that here
+       $MYSQL -e 'DELETE from mysql.user where user="browser" or user="readonly" or user="readwrite" or user="ctdbuser"'
+    else
+       $MYSQL -e "DROP USER IF EXISTS browser@localhost"
+       $MYSQL -e "DROP USER IF EXISTS readonly@localhost"
+       $MYSQL -e "DROP USER IF EXISTS ctdbuser@localhost"
+       $MYSQL -e "DROP USER IF EXISTS readwrite@localhost"
+    fi
+
+    $MYSQL -e "FLUSH PRIVILEGES;"
+
+    $MYSQL -e "CREATE USER browser@localhost IDENTIFIED BY 'genome'"
     $MYSQL -e "GRANT SELECT, INSERT, UPDATE, DELETE, FILE, "\
-"CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on *.* TO browser@localhost IDENTIFIED BY 'genome';"
+"CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on *.* TO browser@localhost"
     
     # FILE permission for this user to all databases to allow DB table loading with
     #       statements such as: "LOAD DATA INFILE file.tab"
@@ -1228,18 +1323,16 @@ function mysqlDbSetup ()
     $MYSQL -e "GRANT FILE on *.* TO browser@localhost;" 
     
     #   Read only access to genome databases for the browser CGI binaries
-    #$MYSQL -e "DROP USER IF EXISTS readonly@localhost"
-    #$MYSQL -e "CREATE USER readonly@localhost IDENTIFIED BY 'access';"
+    $MYSQL -e "CREATE USER readonly@localhost IDENTIFIED BY 'access';"
     $MYSQL -e "GRANT SELECT, CREATE TEMPORARY TABLES on "\
-"*.* TO readonly@localhost IDENTIFIED BY 'access';"
+"*.* TO readonly@localhost;"
     $MYSQL -e "GRANT SELECT, INSERT, CREATE TEMPORARY TABLES on hgTemp.* TO "\
 "readonly@localhost;"
     
     # Readwrite access to hgcentral for browser CGI binaries to keep session state
-    #$MYSQL -e "DROP USER IF EXISTS readwrite@localhost"
-    #$MYSQL -e "CREATE USER readwrite@localhost IDENTIFIED BY 'update';"
+    $MYSQL -e "CREATE USER readwrite@localhost IDENTIFIED BY 'update';"
     $MYSQL -e "GRANT SELECT, INSERT, UPDATE, "\
-"DELETE, CREATE, DROP, ALTER on hgcentral.* TO readwrite@localhost IDENTIFIED BY 'update'; "
+"DELETE, CREATE, DROP, ALTER on hgcentral.* TO readwrite@localhost; "
     
     # create /gbdb and let the apache user write to it
     # hgConvert will download missing liftOver files on the fly and needs write
@@ -1248,10 +1341,9 @@ function mysqlDbSetup ()
     chown $APACHEUSER:$APACHEUSER $GBDBDIR
     
     # the custom track database needs it own user and permissions
-    #$MYSQL -e "DROP USER IF EXISTS ctdbuser@localhost"
-    #$MYSQL -e "CREATE USER ctdbuser@localhost IDENTIFIED BY 'ctdbpassword';"
+    $MYSQL -e "CREATE USER ctdbuser@localhost IDENTIFIED BY 'ctdbpassword';"
     $MYSQL -e "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,INDEX "\
-"on customTrash.* TO ctdbuser@localhost IDENTIFIED BY 'ctdbpassword';"
+"on customTrash.* TO ctdbuser@localhost;"
     
     # removed these now for the new hgGateway page, Apr 2016
     # by default hgGateway needs an empty hg19 database, will crash otherwise
@@ -1267,7 +1359,7 @@ function installBrowser ()
 {
     if [ -f $COMPLETEFLAG ]; then
         echo2 error: the file $COMPLETEFLAG exists. It seems that you have installed the browser already.
-        exit 246
+        exit 100
     fi
 
     echo '--------------------------------'
@@ -1302,6 +1394,8 @@ function installBrowser ()
 
     # ---- END OS-SPECIFIC part -----
 
+    mysqlAllowOldPasswords
+
     if [[ "${SET_MYSQL_ROOT}" == "1" ]]; then
        mysqlChangeRootPwd
     fi
@@ -1324,7 +1418,7 @@ function installBrowser ()
         # test if an apache file is already present
         if [ -f "$APACHEDIR" ]; then
             echo2 error: please remove the file $APACHEDIR, then restart the script with "bash $0".
-            exit 249
+            exit 100
         fi
     fi
 
@@ -1334,7 +1428,7 @@ function installBrowser ()
         echo2 error: the directory $APACHEDIR already exists.
         echo2 This installer has to overwrite it, so please move it to a different name
         echo2 or remove it. Then start the installer again with "bash $0 install"
-        exit 250
+        exit 100
     fi
 
     mysqlDbSetup
@@ -1398,6 +1492,9 @@ function installBrowser ()
         # don't download RNAplot, it's a 32bit binary that won't work anywhere anymore but at UCSC
         # this means that hgGene cannot show RNA structures but that's not a big issue
         $RSYNC -avzP --exclude=RNAplot $HGDOWNLOAD::cgi-bin/ $CGIBINDIR/
+        # now add the binaries for dot and RNAplot 
+        $RSYNC -avzP $HGDOWNLOAD::genome/admin/exe/external.x86_64/RNAplot $CGIBINDIR/
+        $RSYNC -avzP $HGDOWNLOAD::genome/admin/exe/external.x86_64/loader/dot_static $CGIBINDIR/loader/
     fi
 
     # download the html docs, exclude some big files on OSX
@@ -1428,6 +1525,7 @@ function installBrowser ()
     echo2 the parameters 'download "<assemblyName1> <assemblyName2> ..."', e.g. '"'bash $0 mirror mm10 hg19'"'
     echo2 
     showMyAddress
+    exit 0
 }
 
 # GENOME DOWNLOAD: mysql and /gbdb
@@ -1437,7 +1535,7 @@ function downloadGenomes
     GENBANKTBLS=""
     if [ "$DBS" == "" ] ; then
         echo2 Argument error: the '"download"' command requires at least one assembly name, like hg19 or mm10.
-        exit 1
+        exit 100
     fi
 
     echo2
@@ -1574,7 +1672,7 @@ function stopMysql
             # at least seen in Fedora 17
             systemctl stop mysql
     else
-        echo2 Could not find mysql nor mysqld file in /etc/init.d. Please email genome-mirror@soe.ucsc.edu.
+        echo2 Could not find mysql nor mysqld file in /etc/init.d nor a systemd command. Please email genome-mirror@soe.ucsc.edu.
     fi
 }
 
@@ -1592,7 +1690,7 @@ function startMysql
             # at least seen in Fedora 17
             systemctl start mysql
     else
-        echo2 Could not find mysql nor mysqld file in /etc/init.d. Please email genome-mirror@soe.ucsc.edu.
+        echo2 Could not find mysql nor mysqld file in /etc/init.d nor a systemd command. Please email genome-mirror@soe.ucsc.edu.
     fi
 }
 
@@ -1603,7 +1701,7 @@ function downloadMinimal
     DBS=$*
     if [ "$DBS" == "" ] ; then
         echo2 Argument error: the '"minimal"' command requires at least one assembly name, like hg19 or mm10.
-        exit 1
+        exit 100
     fi
 
     echo2
@@ -1728,6 +1826,10 @@ function updateBrowser {
 
 function addTools {
    rsync -avP hgdownload.soe.ucsc.edu::genome/admin/exe/linux.x86_64/ /usr/local/bin/
+   rm -rf /usr/local/bin/blat.tmp # in case an old one is still there
+   mv /usr/local/bin/blat /usr/local/bin/blat.tmp # tools under the BLAT license are separated into their own directory
+   mv /usr/local/bin/blat.tmp/* /usr/local/bin/
+   rmdir /usr/local/bin/blat.tmp
    echo2 The UCSC User Tools were copied to /usr/local/bin
    echo2 Please note that most of the tools require an .hg.conf file in the users
    echo2 home directory. A very minimal .hg.conf file can be found here:
@@ -1787,7 +1889,7 @@ while getopts ":baeut:hof" opt; do
           ONLYGENOMES=1 # do not download hgFixed,go,proteome etc
       else
           echo "Unrecognized -t value. Please read the help message, by running bash $0 -h"
-          exit 1
+          exit 100
       fi
       ;;
     u)
@@ -1808,6 +1910,7 @@ while getopts ":baeut:hof" opt; do
     f)
       if [ ! -f $APACHEDIR/cgi-bin/hg.conf ]; then
          echo Please install a browser first, then switch the data loading mode.
+	 exit 0
       fi
 
       goOnline
@@ -1830,7 +1933,7 @@ DIST=none
 
 if [[ "$unameStr" == MINGW32_NT* ]] ; then
     echo Sorry Windows/CYGWIN is not supported
-    exit 1
+    exit 100
 fi
 
 # set a few very basic variables we need to function
@@ -1877,7 +1980,7 @@ fi
 if [ "$DIST" == "none" ]; then
     echo Sorry, unable to detect your linux distribution. 
     echo Currently only Debian and Redhat-style distributions are supported.
-    exit 3
+    exit 100
 fi
 
 lastArg=${*: -1:1}
@@ -1885,19 +1988,19 @@ if [[ "$#" -gt "1" && ( "${2:0:1}" == "-" ) || ( "${lastArg:0:1}" == "-" )  ]]; 
   echo "Error: The options have to be specified before the command, not after it."
   echo
   echo "$HELP_STR"
-  exit 1
+  exit 100
 fi
 
 if uname -m | grep -vq _64; then
   echo "Your machine does not seem to be a 64bit system"
   echo "Sorry, the Genome Browser requires a 64bit linux."
-  exit 1
+  exit 100
 fi
 
 if [[ "$EUID" != "0" ]]; then
   echo "This script must be run as root or with sudo like this:"
   echo "sudo -H $0"
-  exit 1
+  exit 100
 fi
 
 if [ "${1:-}" == "install" ]; then
@@ -1927,5 +2030,5 @@ elif [ "${1:-}" == "mysql" ]; then
 else
    echo Unknown command: $1
    echo "$HELP_STR"
-   exit 1
+   exit 100
 fi

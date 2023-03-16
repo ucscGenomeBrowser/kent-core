@@ -38,6 +38,9 @@ static struct optionSpec options[] = {
 // TODO: move this to vcf.h
 #define VCF_MIN_COLUMNS 8
 
+// Initial size sufficient for SARS-CoV-2; will be resized if necessary.
+#define DYBITS_INITIAL_SIZE 32 * 1024
+
 struct dyBits
 /* Dynamically sized bit array */
     {
@@ -54,6 +57,7 @@ if (ix >= db->size)
     while (ix >= newSize)
         newSize *= 2;
     db->bits = bitRealloc(db->bits, db->size, newSize);
+    db->size = newSize;
     }
 if (value)
     bitSetOne(db->bits, ix);
@@ -86,7 +90,7 @@ if (excludeVcf)
             if (hel == NULL)
                 {
                 AllocVar(db);
-                db->size = (32 * 1024);  // Sufficient for SARS-CoV-2
+                db->size = (DYBITS_INITIAL_SIZE);
                 db->bits = bitAlloc(db->size);
                 hashAdd(excludeChromPos, words[0], db);
                 }
@@ -339,7 +343,7 @@ while (lineFileNext(lf, &line, NULL))
     if (startsWith("#CHROM", line))
         {
         headerColCount = chopString(line, "\t", NULL, 0);
-        lineFileExpectAtLeast(lf, VCF_NUM_COLS_BEFORE_GENOTYPES+1, headerColCount);
+        lineFileExpectAtLeast(lf, VCF_MIN_COLUMNS, headerColCount);
         AllocArray(words, headerColCount+1);
         chopByChar(line, '\t', words, headerColCount+1);
         printWords(words, headerColCount);

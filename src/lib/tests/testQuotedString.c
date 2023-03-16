@@ -1,7 +1,7 @@
 /* testQuotedString - test the parseQuotedString function */
 
 /* Copyright (C) 2008 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "options.h"
 #include "obscure.h"
@@ -34,7 +34,7 @@ optionInit(&argc, argv, options);
 if (argc < 2)
     usage();
 int i;
-struct dyString *cmdArgs = newDyString(0);
+struct dyString *cmdArgs = dyStringNew(0);
 for (i = 1; i < argc; ++i)
     {
     if (i > 1)
@@ -55,6 +55,6 @@ if (!parseQuotedString(cmdArgs->string, dupe, NULL))
     errAbort("can not parse: '%s'", cmdArgs->string);
 else
     verbose(1, "parsed to: '%s'\n", dupe);
-freeDyString(&cmdArgs);
+dyStringFree(&cmdArgs);
 return 0;
 }

@@ -3,7 +3,7 @@
  * with a "#list of fields" line among other things. */
 
 /* Copyright (C) 2013 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "localmem.h"
@@ -196,7 +196,7 @@ slReverse(&pairList);
 if (fieldIsNumeric)
     slSort(&pairList, slPairCmpNumbers);
 else
-    slSort(&pairList, slPairCmpCase);
+    slSort(&pairList, slPairCmpWordsWithEmbeddedNumbers);
 if (doReverse)
     slReverse(&pairList);
 
@@ -248,6 +248,22 @@ table->startsSharp = startsSharp;
 return table;
 }
 
+struct fieldedTable *fieldedTableAttach(struct lineFile  *lf,  char *requiredFields[], int requiredCount)
+/* Read table from tab-separated file with a #header line that defines the fields
+ * from already open lineFile..  Ensures all requiredFields (if any) are present.  
+ * should be NULL for most purposes.  */
+{
+struct fieldedTable *table = fieldedTableReadTabHeader(lf, requiredFields, requiredCount);
+char numColumns = table->fieldCount + 1;  // + 1 so we'll see lines that are too long
+char *row[numColumns];
+int wordsRead;
+while ((wordsRead = lineFileChopNextTab(lf, row, numColumns)) != 0)
+    {
+    fieldedTableAdd(table, row, wordsRead, lf->lineIx);
+    }
+return table;
+}
+
 struct fieldedTable *fieldedTableFromTabFile(char *fileName, char *reportFileName, 
     char *requiredFields[], int requiredCount)
 /* Read table from tab-separated file with a #header line that defines the fields.  Ensures
@@ -273,15 +289,11 @@ else
     reportFileName = fileName;
     }
 
-struct fieldedTable *table = fieldedTableReadTabHeader(lf, requiredFields, requiredCount);
-char *row[table->fieldCount];
-while (lineFileNextRowTab(lf, row, table->fieldCount))
-    {
-    fieldedTableAdd(table, row, table->fieldCount, lf->lineIx);
-    }
+struct fieldedTable *table = fieldedTableAttach(lf, requiredFields, requiredCount);
 
 /* Clean up and go home. */
 lineFileClose(&lf);
+
 return table;
 }
 
@@ -329,6 +341,16 @@ for (fr = table->rowList; fr != NULL; fr = fr->next)
 
 carefulClose(&f);
 }
+
+void fieldedTableResetRowIds(struct fieldedTable *table, int startId)
+/* Redo ID's in table to be incrementing numbers starting with startId */
+{
+struct fieldedRow *fr;
+int id = startId;
+for (fr  = table->rowList; fr != NULL; fr = fr->next)
+    fr->id = id++;
+}
+
 
 void fieldedTableToTabFile(struct fieldedTable *table, char *fileName)
 /* Write out a fielded table back to file */

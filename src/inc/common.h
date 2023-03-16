@@ -456,6 +456,11 @@ void slFreeList(void *listPt);
  *    slFreeList(&list);
  */
 
+void slFreeListWithFunc(void *listPt, void (*freeFunc)());
+/* Free a list by calling freeFunc on each element.
+ * listPt must be a pointer to a pointer to some slList-compatible struct (&list).
+ * freeFunc must take one arg: a pointer to a pointer to the item it is going to free. */
+
 /******* slInt - an int on a list - the first of many singly linked list structures *******/
 
 struct slInt
@@ -540,6 +545,11 @@ int slNameCmp(const void *va, const void *vb);
 int slNameCmpStringsWithEmbeddedNumbers(const void *va, const void *vb);
 /* Compare strings such as gene names that may have embedded numbers,
  * so that bmp4a comes before bmp14a */
+
+int slNameCmpWordsWithEmbeddedNumbers(const void *va, const void *vb);
+/* Compare strings such as gene names that may have embedded numbers,
+ * in a string sensitive way so that bmp4a comes before bmp14a 
+ * and ABc and abC are treated as the same.  A little slow. */
 
 void slNameSortCase(struct slName **pList);
 /* Sort slName list, ignore case. */
@@ -692,6 +702,10 @@ int slPairCmpCase(const void *va, const void *vb);
 void slPairSortCase(struct slPair **pList);
 /* Sort slPair list, ignore case. */
 
+int slPairCmpWordsWithEmbeddedNumbers(const void *va, const void *vb);
+/* Sort slPairList ignoring case and dealing with embedded numbers so 2 comes
+ * before 10, not after. */
+
 int slPairCmp(const void *va, const void *vb);
 /* Compare two slPairs. */
 
@@ -765,6 +779,9 @@ char *cloneLongString(char *s);
 
 char *catTwoStrings(char *a, char *b);
 /* Allocate new string that is a concatenation of two strings. */
+
+char *catThreeStrings(char *a, char *b, char *c);
+/* Allocate new string that is a concatenation of three strings. */
 
 int differentWord(char *s1, char *s2);
 /* strcmp ignoring case - returns zero if strings are
@@ -1477,7 +1494,18 @@ char *trueFalseString(boolean b);
 
 void uglyTime(char *label, ...)
 /* Print label and how long it's been since last call.  Call with
- * a NULL label to initialize. */
+ * a NULL label to initialize. Works better in html pages cause of formatting */
+
+#if defined(__GNUC__)
+__attribute__((format(printf, 1, 2)))
+#endif
+;
+
+
+void uglyt(char *label, ...)
+/* Print label and how long it's been since last call.  Call with
+ * a NULL label to initialize. Like uglyTime without the html formatting */
+
 #if defined(__GNUC__)
 __attribute__((format(printf, 1, 2)))
 #endif

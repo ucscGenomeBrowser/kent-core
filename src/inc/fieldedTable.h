@@ -61,6 +61,9 @@ void fieldedTableToTabFileWithId(struct fieldedTable *table, char *fileName,
 /* Write out a fielded table back to file.  If idField is non-NULL it will be added
  * to the start of each output line as a steadily incrementing integer starting with startId. */
 
+void fieldedTableResetRowIds(struct fieldedTable *table, int startId);
+/* Redo ID's in table to be incrementing numbers starting with startId */
+
 boolean fieldedTableColumnIsNumeric(struct fieldedTable *table, int fieldIx);
 /* Return TRUE if field has numeric values wherever non-null */
 
@@ -85,6 +88,11 @@ struct hash *fieldedTableIndex(struct fieldedTable *table, char *field);
 
 struct hash *fieldedTableUniqueIndex(struct fieldedTable *table, char *field);
 /* Return hash of fieldedRows keyed by values of given field, which must be unique. */
+
+struct fieldedTable *fieldedTableAttach(struct lineFile  *lf,  char *requiredFields[], int requiredCount);
+/* Read table from tab-separated file with a #header line that defines the fields
+ * from already open lineFile..  Ensures all requiredFields (if any) are present.  
+ * should be NULL for most purposes.  */
 
 #endif /* FIELDEDTABLE_H */
 

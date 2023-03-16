@@ -4,7 +4,7 @@
  * the program is hosed. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "errAbort.h"
@@ -44,6 +44,13 @@ boolean pthreadMayCreate(pthread_t *thread, const pthread_attr_t *attr,
 int err = pthread_create(thread, attr, start_routine, arg);
 pwarn("pthread_create", err);
 return err == 0;
+}
+
+void pthreadJoin(pthread_t *thread, void **retVal)
+/* Wait for thread to complete and optionally get its return value, or die. */
+{
+int err = pthread_join(*thread, retVal);
+perr("pthread_join", err);
 }
 
 void pthreadMutexInit(pthread_mutex_t *mutex)

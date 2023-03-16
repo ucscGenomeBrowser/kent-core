@@ -17,7 +17,7 @@ topLibs:
 	@./checkUmask.sh
 	@MACHTYPE=${MACHTYPE} ./machTest.sh
 	cd lib && ${MAKE}
-ifneq ($(wildcard src/jkOwnLib/*),)
+ifneq ($(wildcard jkOwnLib/*),)
 	cd jkOwnLib && ${MAKE}
 endif
 	cd parasol/lib && ${MAKE}
@@ -27,9 +27,10 @@ optLib:
 	cd optimalLeaf && ${MAKE}
 
 hgLib:
-ifneq ($(wildcard src/hg/makefile),)
+ifneq ($(wildcard hg/makefile),)
 	@./hg/sqlEnvTest.sh
 	cd hg/lib && ${MAKE}
+	cd hg/cgilib && ${MAKE}
 endif
 
 libs: topLibs hgLib optLib
@@ -93,6 +94,7 @@ userApps: topLibs hgLib destBin
 	@for P in ${BLAT_APPLIST}; do \
 	    ( cd $${P} && echo $${P} && ${MAKE} ) ; \
 	done
+	cd tabFile && echo tabFile && ${MAKE} userApps
 	cd utils/userApps && echo utils/userApps && ${MAKE}
 
 destBin:
@@ -109,7 +111,7 @@ clean:
 	cd lib && ${MAKE} clean 
 	cd hg && ${MAKE} clean
 	cd hg && ${MAKE} clean_utils
-ifneq ($(wildcard src/jkOwnLib/*),)
+ifneq ($(wildcard jkOwnLib/*),)
 	cd jkOwnLib && ${MAKE} clean
 endif
 	cd htslib && ${MAKE} clean
@@ -127,7 +129,7 @@ test:: $(testDirs:%=%.test)
 	cd $* && ${MAKE} test
 
 LIB_TAGS_IN = lib/*.[hc] */lib/*.[hc] */*/lib/*.[hc] */*/*/lib/*.[hc] jkOwnLib/*.c \
-	inc/*.h */inc/*.h */*/inc/*.h */*/*/inc/*.h
+	inc/*.h */inc/*.h */*/inc/*.h */*/*/inc/*.h */cgilib/*.[hc]
 
 # build tags for libraries
 .PHONY: tags
@@ -165,7 +167,7 @@ utils: libs destBin
             fi ;\
 	done
 	cd utils && ${MAKE}
-ifneq ($(wildcard src/jkOwnLib/*),)
+ifneq ($(wildcard jkOwnLib/*),)
 	cd hg && ${MAKE} utils
 endif
 
@@ -182,7 +184,7 @@ utils-alpha: check-alpha libs destBin
 	cd hg && ${MAKE} utils
 
 
-ifneq ($(wildcard src/jkOwnLib/*),)
+ifneq ($(wildcard jkOwnLib/*),)
 DIRS = ameme blat index dnaDust protDust weblet aladdin primeMate fuse meta tagStorm tabFile
 else
 DIRS = ameme index dnaDust protDust weblet aladdin primeMate fuse meta tagStorm tabFile

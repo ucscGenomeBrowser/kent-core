@@ -1,5 +1,5 @@
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "linefile.h"
@@ -376,7 +376,7 @@ char *phyloFindPath(struct phyloTree *tree, char *ref, char *cross)
  * of the node names separated by spaces) */
 {
 struct phyloTree *treeRef, *treeCross, *parent;
-struct dyString *ds = newDyString(0);
+struct dyString *ds = dyStringNew(0);
 
 if ((treeRef = phyloFindName(tree,ref)) == NULL)
     return NULL;
@@ -430,7 +430,7 @@ for (ii=0; ii < tree->numEdges; ii++)
 char *phyloNodeNames(struct phyloTree *tree)
 /* add all the node names to a dy string */
 {
-struct dyString *ds = newDyString(0);
+struct dyString *ds = dyStringNew(0);
 
 nodeNames(tree, ds);
 

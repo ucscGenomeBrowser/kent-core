@@ -1,7 +1,7 @@
 /* cCp - copy a file to the cluster fairly efficiently. */
 
 /* Copyright (C) 2013 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "obscure.h"
 #include "dystring.h"
@@ -10,22 +10,22 @@
 static void cCpFile(char *source, char *destHost, char *destFile)
 /* Execute scp command to copy source file to host. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 dyStringPrintf(dy, "scp %s %s:/%s",  source, destHost, destFile);
 system(dy->string);
 printf("%s\n", dy->string);
-freeDyString(&dy);
+dyStringFree(&dy);
 }
 
 void sshSelf(char *hostList, char *host, int start, int count, char *destFile)
 /* Execute ssh command to invoke self. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 dyStringPrintf(dy, "ssh %s ~kent/bin/i386/cCp %s %s %s %d %d &",
 	host, destFile, destFile, hostList, start, count);
 uglyf("%s\n", dy->string);
 system(dy->string);
-freeDyString(&dy);
+dyStringFree(&dy);
 }
 
 void cCp(char *hostList, int startHost, int hostCount, 

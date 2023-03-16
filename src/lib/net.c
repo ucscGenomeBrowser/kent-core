@@ -123,12 +123,13 @@ if (res < 0)
 	remainingTime.tv_usec = (long) (((msTimeout/1000)-remainingTime.tv_sec)*1000000);
 	while (1) 
 	    {
-	    fd_set mySet;
+	    fd_set mySet, exceptSet;
 	    FD_ZERO(&mySet);
 	    FD_SET(sd, &mySet);
+            exceptSet = mySet;
 	    // use tempTime (instead of using remainingTime directly) because on some platforms select() may modify the time val.
 	    struct timeval tempTime = remainingTime;
-	    res = select(sd+1, NULL, &mySet, &mySet, &tempTime);  
+	    res = select(sd+1, NULL, &mySet, &exceptSet, &tempTime);  
 	    if (res < 0) 
 		{
 		if (errno == EINTR)  // Ignore the interrupt 
@@ -207,7 +208,7 @@ if (hostName == NULL)
 if (!internetGetAddrInfo6n4(hostName, portStr, &addressList))
     return -1;
 
-struct dyString *errMsg = newDyString(256);
+struct dyString *errMsg = dyStringNew(256);
 for (address = addressList; address; address = address->ai_next)
     {
     if ((sd = netStreamSocketFromAddrInfo(address)) < 0)
@@ -716,7 +717,7 @@ safecpy(parsed->host, sizeof(parsed->host), s);
 char *urlFromNetParsedUrl(struct netParsedUrl *npu)
 /* Build URL from netParsedUrl structure */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 
 dyStringAppend(dy, npu->protocol);
 dyStringAppend(dy, "://");
@@ -817,7 +818,7 @@ static boolean receiveFtpReply(int sd, char *cmd, struct dyString **retReply, in
  * warn and return FALSE if not desired reply.  If retReply is non-NULL, store reply text there. */
 {
 char *startLastLine = NULL;
-struct dyString *rs = newDyString(4*1024);
+struct dyString *rs = dyStringNew(4*1024);
 while (1)
     {
     int readSize = 0;
@@ -860,9 +861,12 @@ while (1)
     }
 
 int reply = atoi(startLastLine);
+if (retCode)
+    *retCode = reply;
 if ((reply < 200) || (reply > 399))
     {
-    warn("ftp server error on cmd=[%s] response=[%s]",cmd,rs->string);
+    if (!(sameString(cmd,"PASV\r\n") && reply==501))
+	warn("ftp server error on cmd=[%s] response=[%s]",cmd,rs->string);
     return FALSE;
     }
     
@@ -870,8 +874,6 @@ if (retReply)
     *retReply = rs;
 else
     dyStringFree(&rs);
-if (retCode)
-    *retCode = reply;
 return TRUE;
 }
 
@@ -897,6 +899,23 @@ wordCount = chopString(rsStart, ",", words, ArraySize(words));
 if (wordCount != 6)
     errAbort("PASV reply does not parse correctly");
 result = atoi(words[4])*256+atoi(words[5]);    
+return result;
+}    
+
+static int parseEpsvPort(char *rs)
+/* parse EPSV reply to get the port and return it */
+{
+char *words[6];
+int wordCount;
+char *rsStart = strchr(rs,'(');
+char *rsEnd = strchr(rs,')');
+int result = 0;
+rsStart++;
+*rsEnd=0;
+wordCount = chopString(rsStart, "|", words, ArraySize(words));
+if (wordCount != 1)
+    errAbort("EPSV reply does not parse correctly");
+result = atoi(words[0]); // multiple separators treated as one.   
 return result;
 }    
 
@@ -1144,19 +1163,35 @@ else
 if (sd == -1)
     return -1;
 
+int retCode = 0;
 struct dyString *rs = NULL;
-if (!sendFtpCommand(sd, "PASV\r\n", &rs, NULL))
+sendFtpCommand(sd, "PASV\r\n", &rs, &retCode);
+/* 227 Entering Passive Mode (128,231,210,81,222,250) */  
+boolean isIpv6 = FALSE;
+if (retCode == 501)
+    {
+
+    if (!sendFtpCommand(sd, "EPSV\r\n", &rs, NULL))
+    /* 229 Entering Extended Passive Mode (|||44022|) */
+	{
+	close(sd);
+	return -1;
+	}
+    isIpv6 = TRUE;
+
+    }
+else if (retCode != 227)
     {
     close(sd);
     return -1;
     }
-/* 227 Entering Passive Mode (128,231,210,81,222,250) */
 
 if (npu.byteRangeStart != -1)
     {
     safef(cmd,sizeof(cmd),"REST %lld\r\n", (long long) npu.byteRangeStart);
     if (!sendFtpCommand(sd, cmd, NULL, NULL))
 	{
+	dyStringFree(&rs);
 	close(sd);
 	return -1;
 	}
@@ -1167,10 +1202,7 @@ safef(cmd,sizeof(cmd),"%s %s\r\n",((npu.file[strlen(npu.file)-1]) == '/') ? "LIS
 sendFtpCommandOnly(sd, cmd);
 
 int sdata = -1;
-if (proxyUrl)
-    sdata = netConnect(pxy.host, parsePasvPort(rs->string));
-else
-    sdata = netConnect(npu.host, parsePasvPort(rs->string));
+sdata = netConnect(proxyUrl ? pxy.host : npu.host, isIpv6 ? parseEpsvPort(rs->string) : parsePasvPort(rs->string));
 dyStringFree(&rs);
 if (sdata < 0)
     {
@@ -1295,11 +1327,13 @@ int netHttpConnect(char *url, char *method, char *protocol, char *agent, char *o
  * library. optionalHeader may be NULL or contain additional header
  * lines such as cookie info. 
  * Proxy support via hg.conf httpProxy or env var http_proxy
+ * Cert verification control via hg.conf httpsCertCheck or env var https_cert_check
+ * Cert verify domains exception white-list via hg.conf httpsCertCheckDomainExceptions or env var https_cert_check_domain_exceptions
  * Return data socket, or -1 if error.*/
 {
 struct netParsedUrl npu;
 struct netParsedUrl pxy;
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 int sd = -1;
 /* Parse the URL and connect. */
 netParseUrl(url, &npu);
@@ -1497,7 +1531,7 @@ struct dyString *netSlurpFile(int sd)
 {
 char buf[4*1024];
 int readSize;
-struct dyString *dy = newDyString(4*1024);
+struct dyString *dy = dyStringNew(4*1024);
 
 /* Slurp file into dy and return. */
 while ((readSize = read(sd, buf, sizeof(buf))) > 0)
@@ -2166,7 +2200,7 @@ void netHttpGet(struct lineFile *lf, struct netParsedUrl *npu,
 		boolean keepAlive)
 /* Send a GET request, possibly with Keep-Alive. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 
 /* Ask remote server for the file/query. */
 dyStringPrintf(dy, "GET %s HTTP/1.1\r\n", npu->file);
@@ -2216,7 +2250,7 @@ int netHttpGetMultiple(char *url, struct slName *queries, void *userData,
   struct slName *qPtr;
   struct lineFile *lf;
   struct netParsedUrl *npu;
-  struct dyString *dyQ    = newDyString(512);
+  struct dyString *dyQ    = dyStringNew(512);
   struct dyString *body;
   char *base;
   char *hdr;

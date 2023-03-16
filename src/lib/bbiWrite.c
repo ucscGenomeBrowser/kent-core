@@ -1,7 +1,7 @@
 /* bbiWrite.c - Routines to help write bigWig and bigBed files. See also bbiFile.h */
 
 /* Copyright (C) 2014 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "limits.h"
 #include "common.h"
@@ -12,8 +12,10 @@
 #include "cirTree.h"
 #include "bPlusTree.h"
 #include "bbiFile.h"
+#include "bbiAlias.h"
 #include "net.h"
 #include "obscure.h"
+#include "bigBed.h"
 
 void bbiWriteDummyHeader(FILE *f)
 /* Write out all-zero header, just to reserve space for it. */
@@ -169,7 +171,8 @@ for (i=0; i<eim->indexCount; ++i)
     }
 }
 
-struct bbiChromUsage *bbiChromUsageFromBedFile(struct lineFile *lf, struct hash *chromSizesHash, 
+struct bbiChromUsage *bbiChromUsageFromBedFileInternal(struct lineFile *lf, 
+        bbiChromSizeFunc chromSizeFunc,  void *chromSizeClosure,
 	struct bbExIndexMaker *eim, int *retMinDiff, double *retAveSize, bits64 *retBedCount, boolean tabSep)
 /* Go through bed file and collect chromosomes and statistics.  If eim parameter is non-NULL
  * collect max field sizes there too. */
@@ -215,10 +218,10 @@ for (;;)
 	    errAbort("%s is not case-sensitive sorted at line %d.  Please use \"sort -k1,1 -k2,2n\" with LC_COLLATE=C,  or bedSort and try again.",
 	    	lf->fileName, lf->lineIx);
 	    }
-	struct hashEl *chromHashEl = hashLookup(chromSizesHash, chrom);
-	if (chromHashEl == NULL)
-	    errAbort("%s is not found in chromosome sizes file", chrom);
-	int chromSize = ptToInt(chromHashEl->val);
+	int chromSize = (*chromSizeFunc)(chromSizeClosure, chrom, lf->lineIx);
+        if (chromSize == 0)
+            errAbort("%s is not found in chromosome sizes file", chrom);
+       
 	AllocVar(usage);
 	usage->name = cloneString(chrom);
 	usage->id = id++;
@@ -250,6 +253,66 @@ if (bedCount > 0)
 *retAveSize = aveSize;
 *retBedCount = bedCount;
 return usageList;
+}
+
+struct chromSizeClosure  // a structure that contains the data we need to get a chromosome size from a bigBed
+{ 
+    struct bbiFile *bbi;
+    struct bptIndex *bptIndex;
+    struct lm *lm;
+    struct hash *usedAlias;
+};
+
+static int bbChromSizeFunc(void *closure, char *chrom, int lineIx)
+/* A function to return the size of a given sequence. */
+{
+struct chromSizeClosure *bbChromSizeClosure = (struct chromSizeClosure *)closure;
+
+return bbiAliasChromSizeExt(bbChromSizeClosure->bbi, bbChromSizeClosure->bptIndex, bbChromSizeClosure->lm, chrom, bbChromSizeClosure->usedAlias, lineIx);
+}
+
+struct bbiChromUsage *bbiChromUsageFromBedFileAlias(struct lineFile *lf, char *chromAliasBb,
+	struct bbExIndexMaker *eim, int *retMinDiff, double *retAveSize, bits64 *retBedCount, boolean tabSep)
+/* A wrapper for bbiChromUsageFromBedFile that uses a bigBed to find chromosome sizes. */
+{
+struct chromSizeClosure *bbChromSizeClosure = NULL;
+
+AllocVar(bbChromSizeClosure);
+bbChromSizeClosure->bbi = bigBedFileOpen(chromAliasBb);
+bbChromSizeClosure->bptIndex = bbiAliasOpenExtra(bbChromSizeClosure->bbi);
+bbChromSizeClosure->lm = lmInit(0);
+bbChromSizeClosure->usedAlias = hashNew(0);
+
+struct bbiChromUsage *usageList = bbiChromUsageFromBedFileInternal(lf, bbChromSizeFunc, bbChromSizeClosure, eim, retMinDiff, retAveSize, retBedCount, tabSep);
+
+bbiFileClose(&bbChromSizeClosure->bbi);
+struct bptIndex *next, *bptIndex = bbChromSizeClosure->bptIndex;
+for(; bptIndex; bptIndex = next)
+    {
+    next = bptIndex->next;
+    freez(&bptIndex);
+    }
+lmCleanup(&bbChromSizeClosure->lm);
+
+return usageList;
+}
+
+static int chromHashSizeFunc(void *closure, char *chrom, int lineIx)
+/* Function to find the size of sequence using a hash passed in as a closure. */
+{
+struct hash *chromSizesHash = (struct hash *)closure;
+struct hashEl *chromHashEl = hashLookup(chromSizesHash, chrom);
+if (chromHashEl == NULL)
+    errAbort("%s is not found in chromosome sizes file", chrom);
+return ptToInt(chromHashEl->val);
+}
+
+struct bbiChromUsage *bbiChromUsageFromBedFile(struct lineFile *lf, struct hash *chromSizesHash, 
+	struct bbExIndexMaker *eim, int *retMinDiff, double *retAveSize, bits64 *retBedCount, boolean tabSep)
+/* A wrapper for bbiChromUsageFromBedFile that uses a hash to find chromosome sizes. */
+{
+return bbiChromUsageFromBedFileInternal(lf, chromHashSizeFunc, chromSizesHash,
+	eim, retMinDiff, retAveSize, retBedCount, tabSep);
 }
 
 int bbiCalcResScalesAndSizes(int aveSize, 
@@ -302,7 +365,7 @@ int bbiWriteZoomLevels(
 {
 /* Write out first zoomed section while storing in memory next zoom level. */
 assert(resTryCount > 0);
-int maxReducedSize = dataSize/2;
+bits64 maxReducedSize = dataSize/2;
 int initialReduction = 0, initialReducedCount = 0;
 
 /* Figure out initialReduction for zoom - one that is maxReducedSize or less. */

@@ -1,7 +1,7 @@
 /* fastqToFa - Convert from fastq to fasta format.. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "linefile.h"
 #include "hash.h"
@@ -53,7 +53,7 @@ boolean inSequence = FALSE;
 long long seqCount = 0;
 long long totalSize = 0;
 boolean readingOk = lineFileNextReal(lf, &line);
-char seqNameNote[128];
+char seqNameNote[4096];
 FILE *qFH = NULL;
 FILE *qSZ = NULL;
 

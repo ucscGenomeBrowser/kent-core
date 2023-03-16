@@ -1,7 +1,7 @@
 /* bamFile -- interface to binary alignment format files using Heng Li's samtools lib. */
 
 /* Copyright (C) 2014 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "portable.h"
@@ -23,7 +23,12 @@ static bam_index_t *bamOpenIndexGivenUrl(samfile_t *sam, char *fileOrUrl, char *
  * The difference to bamOpenIndex is that the URL/filename of the bai file can be specified. */
 {
 if (sam->format.format == cram) 
-    return sam_index_load(sam, fileOrUrl);
+    {
+    if (baiFileOrUrl)
+       return sam_index_load2(sam, fileOrUrl, baiFileOrUrl);
+    else
+       return sam_index_load(sam, fileOrUrl);
+    }
 
 // assume that index is a .bai file 
 char indexName[4096];

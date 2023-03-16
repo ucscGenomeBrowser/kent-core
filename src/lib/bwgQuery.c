@@ -2,7 +2,7 @@
  * format. */
 
 /* Copyright (C) 2012 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "linefile.h"
@@ -23,10 +23,16 @@
 #include "bigBed.h"
 
 
+struct bbiFile *bigWigFileOpenAlias(char *fileName, aliasFunc aliasFunc)
+/* Open up big wig file. Using alias hash if not NULL */
+{
+return bbiFileOpenAlias(fileName, bigWigSig, "big wig", aliasFunc);
+}
+
 struct bbiFile *bigWigFileOpen(char *fileName)
 /* Open up big wig file. */
 {
-return bbiFileOpen(fileName, bigWigSig, "big wig");
+return bigWigFileOpenAlias(fileName, NULL);
 }
 
 boolean bigWigFileCheckSigs(char *fileName)

@@ -2,7 +2,7 @@
  * a vGfx need to know about, but not the clients. */
 
 /* Copyright (C) 2010 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 
 struct vGfx *vgHalfInit(int width, int height);
@@ -27,9 +27,12 @@ typedef void (*vg_text)(void *v, int x, int y, int colorIx, void *font,
 	char *text);
 typedef void (*vg_textRight)(void *v, int x, int y, int width, int height,
 	int colorIx, void *font, char *text);
+typedef void (*vg_textInBox)(void *v, int x, int y, int width, int height,
+	int colorIx, void *font, char *text);
 typedef void (*vg_textCentered)(void *v, int x, int y, int width, int height,
 	int colorIx, void *font, char *text);
 typedef int (*vg_findColorIx)(void *v, int r, int g, int b);
+typedef int (*vg_findAlphaColorIx)(void *v, int r, int g, int b, int a);
 typedef struct rgbColor (*vg_colorIxToRgb)(void *v, int colorIx);
 typedef void (*vg_setClip)(void *v, int x, int y, int width, int height);
 typedef void (*vg_setWriteMode)(void *v, unsigned int writeMode);

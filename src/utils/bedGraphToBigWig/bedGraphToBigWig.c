@@ -1,7 +1,7 @@
 /* bedGraphToBigWig - Convert a bedGraph program to bigWig.. */
 
 /* Copyright (C) 2013 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "obscure.h"
 #include "memalloc.h"
@@ -18,10 +18,12 @@
 #include "bbiFile.h"
 #include "bwgInternal.h"
 #include "bigWig.h"
+#include "portable.h"
 
 
-char *version = "2.8";   // when changing, change in bedToBigBed, bedGraphToBigWig, and wigToBigWig
+char *version = "2.9";   // when changing, change in bedToBigBed, bedGraphToBigWig, and wigToBigWig
 /* Version history from 2.8 on at least -
+ * 2.9 - ability to specify chromAlias bigBed as chromSizes file
  * 2.8  sync up version numbers with bedToBigBed 
  */
 
@@ -30,6 +32,7 @@ static int itemsPerSlot = 1024;
 static boolean doCompress = FALSE;
 static int maxGigs = 100;   // Maximum number of gigs to allocate in one block.  
 			    // Undocumented on purpose.
+static boolean sizesIsBb = FALSE;
 
 
 void usage()
@@ -53,6 +56,7 @@ errAbort(
   "options:\n"
   "   -blockSize=N - Number of items to bundle in r-tree.  Default %d\n"
   "   -itemsPerSlot=N - Number of data points bundled at lowest level. Default %d\n"
+  "   -sizesIsBb  -- If set, the chrom.sizes file is assumed to be a bigBed file.\n"
   "   -unc - If set, do not use compression."
   , version, bbiCurrentVersion, blockSize, itemsPerSlot
   );
@@ -61,6 +65,7 @@ errAbort(
 static struct optionSpec options[] = {
    {"blockSize", OPTION_INT},
    {"itemsPerSlot", OPTION_INT},
+   {"sizesIsBb", OPTION_BOOLEAN},
    {"unc", OPTION_BOOLEAN},
    {"maxGigs", OPTION_INT},
    {NULL, 0},
@@ -370,16 +375,25 @@ return twiceReducedList;
 void bedGraphToBigWig(char *inName, char *chromSizes, char *outName)
 /* bedGraphToBigWig - Convert a bedGraph program to bigWig.. */
 {
+mustBeReadableAndRegularFile(inName);
+
 verboseTimeInit();
 struct lineFile *lf = lineFileOpen(inName, TRUE);
-struct hash *chromSizesHash = bbiChromSizesFromFile(chromSizes);
-verbose(2, "%d chroms in %s\n", chromSizesHash->elCount, chromSizes);
 int minDiff = 0, i;
 double aveSize = 0;
 bits64 bedCount = 0;
 bits32 uncompressBufSize = 0;
-struct bbiChromUsage *usageList = bbiChromUsageFromBedFile(lf, chromSizesHash, NULL, 
-    &minDiff, &aveSize, &bedCount, FALSE);
+struct bbiChromUsage *usageList;
+
+if (sizesIsBb)
+    usageList = bbiChromUsageFromBedFileAlias(lf, chromSizes, NULL, &minDiff, &aveSize, &bedCount, FALSE);
+else
+    {
+    struct hash *chromSizesHash = bbiChromSizesFromFile(chromSizes);
+    verbose(2, "%d chroms in %s\n", chromSizesHash->elCount, chromSizes);
+    usageList = bbiChromUsageFromBedFile(lf, chromSizesHash, NULL, 
+        &minDiff, &aveSize, &bedCount, FALSE);
+    }
 verboseTime(2, "pass1");
 verbose(2, "%d chroms in %s, minDiff=%d, aveSize=%g, bedCount=%lld\n", 
     slCount(usageList), inName, minDiff, aveSize, bedCount);
@@ -505,6 +519,7 @@ maxGigs = optionInt("maxGigs", maxGigs);
 setMaxAlloc(maxGigs*1000000000L);  
 blockSize = optionInt("blockSize", blockSize);
 itemsPerSlot = optionInt("itemsPerSlot", itemsPerSlot);
+sizesIsBb = optionExists("sizesIsBb");
 doCompress = !optionExists("unc");
 if (argc != 4)
     usage();

@@ -3,7 +3,7 @@
  * a postScript file. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 
 #include "common.h"
 #include "vGfx.h"
@@ -32,14 +32,14 @@ return vg;
 }
 
 int vgFindRgb(struct vGfx *vg, struct rgbColor *rgb)
-/* Find color index corresponding to rgb color. */
+/* Find color index corresponding to rgba color. */
 {
-return vgFindColorIx(vg, rgb->r, rgb->g, rgb->b);
+return vgFindAlphaColorIx(vg, rgb->r, rgb->g, rgb->b, rgb->a);
 }
 
 Color vgContrastingColor(struct vGfx *vg, int backgroundIx)
 /* Return black or white whichever would be more visible over
- * background. */
+ * background. Note: ignores alpha. */
 {
 struct rgbColor c = vgColorIxToRgb(vg, backgroundIx);
 int val = (int)c.r + c.g + c.g + c.b;

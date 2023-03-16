@@ -195,6 +195,9 @@ void dotForUserInit(int dotMod);
 void dotForUser();
 /* Write out a dot every _dotForUserMod times this is called. */
 
+void dotForUserEnd();
+/* Write out new line at end of dots for user */
+
 void spaceToUnderbar(char *s);
 /* Convert white space to underbar. */
 
@@ -226,4 +229,6 @@ void ensureNamesCaseUnique(struct slName *fieldList);
 boolean readAndIgnore(char *fileName);
 /* Read a byte from fileName, so its access time is updated. */
 
+int get_thread_id();
+/* return an integer specific for the current thread */
 #endif /* OBSCURE_H */

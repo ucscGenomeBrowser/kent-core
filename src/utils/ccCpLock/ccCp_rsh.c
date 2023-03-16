@@ -1,7 +1,7 @@
 /* ccCp - copy file to the cluster efficiently. */
 
 /* Copyright (C) 2011 The Regents of the University of California 
- * See README in this or parent directory for licensing information. */
+ * See kent/LICENSE or http://genome.ucsc.edu/license/ for licensing information. */
 #include "common.h"
 #include "obscure.h"
 #include "portable.h"
@@ -27,36 +27,36 @@ return cloneString(fullPath);
 int rcpFile(char *source, char *destHost, char *destFile)
 /* Execute rcp command to copy source file to host. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 int ret;
 
 dyStringPrintf(dy, "rcp %s %s:/%s >/dev/null",  source, destHost, destFile);
 ret = system(dy->string);
-freeDyString(&dy);
+dyStringFree(&dy);
 return ret;
 }
 
 int cpFile(char *source, char *destFile)
 /* Execute cp command to copy file to host. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 int ret;
 
 dyStringPrintf(dy, "cp %s %s",  source, destFile);
 ret = system(dy->string);
-freeDyString(&dy);
+dyStringFree(&dy);
 return ret;
 }
 
 void rshSelf(char *hostList, char *host, int start, char *destFile, char *lockDir)
 /* Execute ssh command to invoke self. */
 {
-struct dyString *dy = newDyString(512);
+struct dyString *dy = dyStringNew(512);
 dyStringPrintf(dy, 
         "rsh %s /projects/compbio/experiments/hg/bin/i386/ccCp %s %s %d %s &",
 	host, destFile, hostList, start, lockDir);
 system(dy->string);
-freeDyString(&dy);
+dyStringFree(&dy);
 }
 
 void usage()
