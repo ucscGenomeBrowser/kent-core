@@ -1,0 +1,32 @@
+#!/bin/bash -e
+#
+# euronode-dbload [-inclEsts] [-extFileUpdate] [-allowLargeDeletes]
+#
+# dbload for euronode servers.
+opts="$*"
+
+# other options to include
+otherOpts=""
+
+# initialize
+gbBuildServer=hgwdev.sdsc.edu
+rsyncPort="ssh"
+gbBuildRoot=/hive/data/outside/genbank
+gbRoot=/data/genbank
+cd $gbRoot
+
+# update the etc, bin, and lib directories
+gbRRServer=hgnfs1.soe.ucsc.edu
+gbRRRoot=/genbank
+rsync -ra $rsyncOpts $gbRRServer:$gbRRRoot/etc $gbRRServer:$gbRRRoot/bin $gbRRServer:$gbRRRoot/lib .
+
+. $gbRoot/lib/gbCommon.sh
+databases=`gbGetDatabases etc/rr.dbs`
+
+# workdir is a local dir
+workdir=/data/tmp/genbank
+
+# wait for copy to hgwnfs1
+copyTime=var/copy/copy.time
+
+exec $gbRoot/etc/dbload $opts $otherOpts $gbRoot "$databases" $copyTime $workdir
