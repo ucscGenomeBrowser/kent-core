@@ -1,0 +1,16 @@
+#!/bin/bash
+set -beEu -o pipefail
+
+deciphervarfile=$1
+
+# Get canonical gene symbols
+hgsql -Ne "select chrom,chromStart,chromEnd,geneSymbol from knownCanonical kc join kgXref kg on kc.transcript=kg.kgID" hg38 | sort -k1,1 -k2,2n > hg38.knownCanonical.genes
+
+../processDecipher.py $deciphervarfile hg38.knownCanonical.genes decipherCnv.bed decipherSnvsNew.bed decipherSnvsRawNew.txt
+bedSort decipherSnvsNew.bed decipherSnvsNew.bed
+bedSort decipherCnv.bed decipherCnv.bed
+
+hgLoadBed hg38 decipherSnvsNew decipherSnvsNew.bed
+hgLoadSqlTab hg38 decipherSnvsRawNew ../decipherSnvsRaw.sql decipherSnvsRawNew.txt
+
+bedToBigBed -extraIndex=name -tab -as=../decipherCnv.as -type=bed9+10 decipherCnv.bed /hive/data/genomes/hg38/chrom.sizes decipherCnv.bb

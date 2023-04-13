@@ -1,0 +1,88 @@
+
+# Primates
+
+# Common to all:        Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Coelomata; Deuterostomia; Chordata; Craniata; Vertebrata; Gnathostomata; Teleostomi; Euteleostomi; Sarcopterygii; Tetrapoda; Amniota; Mammalia; Theria; Eutheria; Euarchontoglires; Primates; 
+
+# human - homo sapiens
+hg	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hominidae; Homininae; Homo
+
+# chimp - pan troglodytes
+panTro	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hominidae; Homininae; Pan
+
+# bonobo - Pan paniscus
+panPan	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hominidae; Homininae; Pan
+
+# gorilla - gorilla gorilla gorilla
+gorGor	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hominidae; Homininae; Gorilla
+
+# orangutan - pongo abelii
+ponAbe	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hominidae; Ponginae; Pongo
+
+# gibbon - nomascus leucogenys
+nomLeu	Haplorrhini; Simiiformes; Catarrhini; Hominoidea; Hylobatidae; Nomascus
+
+# green monkey - Chlorocebus sabaeus
+chlSab	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Chlorocebus
+
+# manLeu - Drill - Mandrillus leucophaeus
+manLeu	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Mandrillus
+
+# rhesus - Macaca mulatta
+rheMac	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Macaca
+
+# crab-eating macaque - Macaca fascicularis
+macFas	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Macaca; Macaca fascicularis
+
+# macNem - Pig-tailed macaque - Macaca nemestrina
+macNem	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Macaca
+
+# cerAty - Sooty mangabey - Cercocebus atys
+cerAty	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Cercocebus
+
+# papAnu - Baboon - Papio anubis
+papAnu	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Papio
+
+# baboon - papio hamadryas
+papHam	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Cercopithecinae; Papio
+
+# Proboscis monkey - Nasalis larvatus
+nasLar	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Colobinae; Nasalis
+
+# colAng - Angolan colobus - Colobus angolensis palliatus
+colAng	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Colobinae; Colobus; Colobus angolensis
+
+# Golden snub-nosed monkey - Rhinopithecus roxellana
+rhiRox	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Colobinae; Rhinopithecus
+
+# rhiBie - Black snub-nosed monkey - Rhinopithecus bieti
+rhiBie	Haplorrhini; Simiiformes; Catarrhini; Cercopithecoidea; Cercopithecidae; Colobinae; Rhinopithecus
+
+# squirrel monkey - Saimiri boliviensis
+saiBol	Haplorrhini; Simiiformes; Platyrrhini; Cebidae; Saimiriinae; Saimiri
+
+# cebCap - White-faced sapajou - Cebus capucinus imitator
+cebCap	Haplorrhini; Simiiformes; Platyrrhini; Cebidae; Cebinae; Cebus; Cebus capucinus
+
+# aotNan - Ma's night monkey - Aotus nancymaae
+aotNan	Haplorrhini; Simiiformes; Platyrrhini; Aotidae; Aotus
+
+# marmoset - callithrix jacchus
+calJac	Haplorrhini; Simiiformes; Platyrrhini; Cebidae; Callitrichinae; Callithrix
+
+# tarsier - tarsius syrichta
+tarSyr	Haplorrhini; Tarsiiformes; Tarsiidae; Tarsius
+
+# lemur - microcebus murinus
+micMur	Strepsirrhini; Lemuriformes; Cheirogaleidae; Microcebus
+
+# proCoq - Coquerel's sifaka - Propithecus coquereli
+proCoq	Strepsirrhini; Lemuriformes; Indriidae; Propithecus
+
+# eulMac - Black lemur - Eulemur macaco
+eulMac	Strepsirrhini; Lemuriformes; Lemuridae; Eulemur
+
+# eulFla - Sclater's lemur - Eulemur flavifrons
+eulFla	Strepsirrhini; Lemuriformes; Lemuridae; Eulemur
+
+# galago - Otolemur garnettii
+otoGar	Strepsirrhini; Lorisiformes; Galagidae; Otolemur

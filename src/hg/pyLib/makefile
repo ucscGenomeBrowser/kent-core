@@ -1,0 +1,46 @@
+kentSrc = ../..
+include ../../inc/common.mk
+
+#cannot use common include rules, don't know how to overwrite :: targets
+#include ../../inc/cgi_build_rules.mk
+
+ifeq (${CGI_BIN_USER},)
+    CGI_BIN_USER=${CGI_BIN}-${USER}
+endif
+
+ifeq (${CGI_BIN_BETA},)
+    CGI_BIN_BETA=${CGI_BIN}-beta
+endif
+
+my:: compile 
+	mkdir -p ${CGI_BIN_USER}/pyLib/
+	rm -f ${CGI_BIN_USER}/pyLib/{hgLib.{py,pyc,pyo},six.*} 
+	cp -p hgLib.py ${CGI_BIN_USER}/pyLib/hgLib.py
+	cp -p hgLib.pyo ${CGI_BIN_USER}/pyLib/hgLib.pyo
+	cp -p six.* ${CGI_BIN_USER}/pyLib/
+	
+beta:: compile
+	mkdir -p ${CGI_BIN_BETA}/pyLib/
+	rm -f ${CGI_BIN_BETA}/pyLib/{hgLib.{py,pyc,pyo},six.*} 
+	cp -p hgLib.py ${CGI_BIN_BETA}/pyLib/hgLib.py
+	cp -p hgLib.pyo ${CGI_BIN_BETA}/pyLib/hgLib.pyo
+	cp -p six.* ${CGI_BIN_BETA}/pyLib/
+	
+alpha:: compile
+	mkdir -p ${CGI_BIN}/pyLib/
+	rm -f ${CGI_BIN}/pyLib/{hgLib.{py,pyc,pyo},six.*} 
+	cp -p hgLib.py ${CGI_BIN}/pyLib/hgLib.py
+	cp -p hgLib.pyo ${CGI_BIN}/pyLib/hgLib.pyo
+	cp -p six.* ${CGI_BIN}/pyLib/
+	
+compile:
+	# byte-compile and strip all python source code to .pyo files
+	python2.7 -OO -m compileall ./
+
+clean::
+	rm -f *.pyc *.pyo
+
+lint::
+	pylint -E hgLib.py
+
+install::
