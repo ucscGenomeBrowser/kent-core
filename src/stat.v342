@@ -1,0 +1,44 @@
+# On branch v342_branch
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	alpha.log
+#	hg/make.beta.log
+#	hg/qaPushQ/formPushQ.h
+#	hg/qaPushQ/pushQ.c
+#	hg/qaPushQ/pushQ.h
+#	hg/qaPushQ/pushQ.sql
+#	mout.libs.v304Patched.log
+#	stat.0
+#	stat.1
+#	stat.v342
+#	utils/qa/weeklybld/CherryPickCommits.conf
+#	utils/qa/weeklybld/GitReports.ok
+#	utils/qa/weeklybld/RevertCommits.conf
+#	utils/qa/weeklybld/boxRelease.csh.0
+#	utils/qa/weeklybld/doNewBranch-recompile-oldversion-galt.csh
+#	utils/qa/weeklybld/doNewGit.log
+#	utils/qa/weeklybld/doZip.csh.1
+#	utils/qa/weeklybld/finiGitReports.csh
+#	utils/qa/weeklybld/finiNewBranch.csh
+#	utils/qa/weeklybld/finiNewReview.csh
+#	utils/qa/weeklybld/finiReview2.csh
+#	utils/qa/weeklybld/fixUserApps.sh
+#	utils/qa/weeklybld/foo.log
+#	utils/qa/weeklybld/logs.v304.patch1.log
+#	utils/qa/weeklybld/logs/
+#	utils/qa/weeklybld/master
+#	utils/qa/weeklybld/sendBeta.sh
+#	utils/qa/weeklybld/stat.0
+#	utils/qa/weeklybld/stat.1
+#	utils/qa/weeklybld/t.csh
+#	utils/qa/weeklybld/t.sh
+#	utils/qa/weeklybld/test.hgcentraltemp.sql
+#	utils/qa/weeklybld/testEmail.csh
+#	utils/qa/weeklybld/testHgCent.csh
+#	utils/qa/weeklybld/testInfo.h
+#	utils/qa/weeklybld/testSend.csh
+#	utils/qa/weeklybld/v291.userApps.csh
+#	utils/qa/weeklybld/v294patch1PickCommits.csh
+#	utils/qa/weeklybld/v324.doRobots.csh
+nothing added to commit but untracked files present (use "git add" to track)

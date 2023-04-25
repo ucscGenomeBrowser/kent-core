@@ -1,0 +1,528 @@
+cd refreshNamedSessionCustomTracks && echo refreshNamedSessionCustomTracks && make
+refreshNamedSessionCustomTracks
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/refreshNamedSessionCustomTracks'
+gcc -DCGI_BIN=\"/usr/local/apache/cgi-bin\" -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o refreshNamedSessionCustomTracks.o -c refreshNamedSessionCustomTracks.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/refreshNamedSessionCustomTracks refreshNamedSessionCustomTracks.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/refreshNamedSessionCustomTracks
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/refreshNamedSessionCustomTracks'
+cd automation && echo automation && make
+automation
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/automation'
+mkdir -p /cluster/home/build/bin/scripts
+rm -f /cluster/home/build/bin/scripts/Encode.pm
+echo cp -p Encode.pm /cluster/home/build/bin/scripts
+cp -p Encode.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/Encode.pm
+rm -f /cluster/home/build/bin/scripts/HgAutomate.pm
+echo cp -p HgAutomate.pm /cluster/home/build/bin/scripts
+cp -p HgAutomate.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/HgAutomate.pm
+rm -f /cluster/home/build/bin/scripts/HgDb.pm
+echo cp -p HgDb.pm /cluster/home/build/bin/scripts
+cp -p HgDb.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/HgDb.pm
+rm -f /cluster/home/build/bin/scripts/RAFile.pm
+echo cp -p RAFile.pm /cluster/home/build/bin/scripts
+cp -p RAFile.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/RAFile.pm
+rm -f /cluster/home/build/bin/scripts/SafePipe.pm
+echo cp -p SafePipe.pm /cluster/home/build/bin/scripts
+cp -p SafePipe.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/SafePipe.pm
+rm -f /cluster/home/build/bin/scripts/EnsGeneAutomate.pm
+echo cp -p EnsGeneAutomate.pm /cluster/home/build/bin/scripts
+cp -p EnsGeneAutomate.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/EnsGeneAutomate.pm
+rm -f /cluster/home/build/bin/scripts/HgRemoteScript.pm
+echo cp -p HgRemoteScript.pm /cluster/home/build/bin/scripts
+cp -p HgRemoteScript.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/HgRemoteScript.pm
+rm -f /cluster/home/build/bin/scripts/HgStepManager.pm
+echo cp -p HgStepManager.pm /cluster/home/build/bin/scripts
+cp -p HgStepManager.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/HgStepManager.pm
+rm -f /cluster/home/build/bin/scripts/AsmHub.pm
+echo cp -p AsmHub.pm /cluster/home/build/bin/scripts
+cp -p AsmHub.pm /cluster/home/build/bin/scripts
+chmod 664 /cluster/home/build/bin/scripts/AsmHub.pm
+rm -f /cluster/home/build/bin/scripts/asmHubAllGaps.pl
+echo cp -p asmHubAllGaps.pl /cluster/home/build/bin/scripts
+cp -p asmHubAllGaps.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubAllGaps.pl
+rm -f /cluster/home/build/bin/scripts/asmHubAssembly.pl
+echo cp -p asmHubAssembly.pl /cluster/home/build/bin/scripts
+cp -p asmHubAssembly.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubAssembly.pl
+rm -f /cluster/home/build/bin/scripts/asmHubAugustusGene.pl
+echo cp -p asmHubAugustusGene.pl /cluster/home/build/bin/scripts
+cp -p asmHubAugustusGene.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubAugustusGene.pl
+rm -f /cluster/home/build/bin/scripts/asmHubCpG.pl
+echo cp -p asmHubCpG.pl /cluster/home/build/bin/scripts
+cp -p asmHubCpG.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubCpG.pl
+rm -f /cluster/home/build/bin/scripts/asmHubEnsGene.pl
+echo cp -p asmHubEnsGene.pl /cluster/home/build/bin/scripts
+cp -p asmHubEnsGene.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubEnsGene.pl
+rm -f /cluster/home/build/bin/scripts/asmHubGap.pl
+echo cp -p asmHubGap.pl /cluster/home/build/bin/scripts
+cp -p asmHubGap.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubGap.pl
+rm -f /cluster/home/build/bin/scripts/asmHubGatewayPage.pl
+echo cp -p asmHubGatewayPage.pl /cluster/home/build/bin/scripts
+cp -p asmHubGatewayPage.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubGatewayPage.pl
+rm -f /cluster/home/build/bin/scripts/asmHubGc5Percent.pl
+echo cp -p asmHubGc5Percent.pl /cluster/home/build/bin/scripts
+cp -p asmHubGc5Percent.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubGc5Percent.pl
+rm -f /cluster/home/build/bin/scripts/asmHubHtml.pl
+echo cp -p asmHubHtml.pl /cluster/home/build/bin/scripts
+cp -p asmHubHtml.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubHtml.pl
+rm -f /cluster/home/build/bin/scripts/asmHubRepeatMasker.sh
+echo cp -p asmHubRepeatMasker.sh /cluster/home/build/bin/scripts
+cp -p asmHubRepeatMasker.sh /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubRepeatMasker.sh
+rm -f /cluster/home/build/bin/scripts/asmHubRmsk.pl
+echo cp -p asmHubRmsk.pl /cluster/home/build/bin/scripts
+cp -p asmHubRmsk.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubRmsk.pl
+rm -f /cluster/home/build/bin/scripts/asmHubSimpleRepeat.pl
+echo cp -p asmHubSimpleRepeat.pl /cluster/home/build/bin/scripts
+cp -p asmHubSimpleRepeat.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubSimpleRepeat.pl
+rm -f /cluster/home/build/bin/scripts/asmHubTrackDb.sh
+echo cp -p asmHubTrackDb.sh /cluster/home/build/bin/scripts
+cp -p asmHubTrackDb.sh /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubTrackDb.sh
+rm -f /cluster/home/build/bin/scripts/asmHubWindowMasker.pl
+echo cp -p asmHubWindowMasker.pl /cluster/home/build/bin/scripts
+cp -p asmHubWindowMasker.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/asmHubWindowMasker.pl
+rm -f /cluster/home/build/bin/scripts/blastz-make-joblist
+echo cp -p blastz-make-joblist /cluster/home/build/bin/scripts
+cp -p blastz-make-joblist /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/blastz-make-joblist
+rm -f /cluster/home/build/bin/scripts/blastz-normalizeLav
+echo cp -p blastz-normalizeLav /cluster/home/build/bin/scripts
+cp -p blastz-normalizeLav /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/blastz-normalizeLav
+rm -f /cluster/home/build/bin/scripts/blastz-run-ucsc
+echo cp -p blastz-run-ucsc /cluster/home/build/bin/scripts
+cp -p blastz-run-ucsc /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/blastz-run-ucsc
+rm -f /cluster/home/build/bin/scripts/doAssemblyHub.pl
+echo cp -p doAssemblyHub.pl /cluster/home/build/bin/scripts
+cp -p doAssemblyHub.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doAssemblyHub.pl
+rm -f /cluster/home/build/bin/scripts/doAugustus.pl
+echo cp -p doAugustus.pl /cluster/home/build/bin/scripts
+cp -p doAugustus.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doAugustus.pl
+rm -f /cluster/home/build/bin/scripts/doBlastzChainNet.pl
+echo cp -p doBlastzChainNet.pl /cluster/home/build/bin/scripts
+cp -p doBlastzChainNet.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doBlastzChainNet.pl
+rm -f /cluster/home/build/bin/scripts/doCpgIslands.pl
+echo cp -p doCpgIslands.pl /cluster/home/build/bin/scripts
+cp -p doCpgIslands.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doCpgIslands.pl
+rm -f /cluster/home/build/bin/scripts/doEnsGeneUpdate.pl
+echo cp -p doEnsGeneUpdate.pl /cluster/home/build/bin/scripts
+cp -p doEnsGeneUpdate.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doEnsGeneUpdate.pl
+rm -f /cluster/home/build/bin/scripts/doGenscan.pl
+echo cp -p doGenscan.pl /cluster/home/build/bin/scripts
+cp -p doGenscan.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doGenscan.pl
+rm -f /cluster/home/build/bin/scripts/doHgNearBlastp.pl
+echo cp -p doHgNearBlastp.pl /cluster/home/build/bin/scripts
+cp -p doHgNearBlastp.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doHgNearBlastp.pl
+rm -f /cluster/home/build/bin/scripts/doIdKeys.pl
+echo cp -p doIdKeys.pl /cluster/home/build/bin/scripts
+cp -p doIdKeys.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doIdKeys.pl
+rm -f /cluster/home/build/bin/scripts/ensemblInfo.pl
+echo cp -p ensemblInfo.pl /cluster/home/build/bin/scripts
+cp -p ensemblInfo.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/ensemblInfo.pl
+rm -f /cluster/home/build/bin/scripts/synBlastp.csh
+echo cp -p synBlastp.csh /cluster/home/build/bin/scripts
+cp -p synBlastp.csh /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/synBlastp.csh
+rm -f /cluster/home/build/bin/scripts/doRecipBest.pl
+echo cp -p doRecipBest.pl /cluster/home/build/bin/scripts
+cp -p doRecipBest.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doRecipBest.pl
+rm -f /cluster/home/build/bin/scripts/doRepeatMasker.pl
+echo cp -p doRepeatMasker.pl /cluster/home/build/bin/scripts
+cp -p doRepeatMasker.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doRepeatMasker.pl
+rm -f /cluster/home/build/bin/scripts/doWindowMasker.pl
+echo cp -p doWindowMasker.pl /cluster/home/build/bin/scripts
+cp -p doWindowMasker.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doWindowMasker.pl
+rm -f /cluster/home/build/bin/scripts/doSimpleRepeat.pl
+echo cp -p doSimpleRepeat.pl /cluster/home/build/bin/scripts
+cp -p doSimpleRepeat.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doSimpleRepeat.pl
+rm -f /cluster/home/build/bin/scripts/doSameSpeciesLiftOver.pl
+echo cp -p doSameSpeciesLiftOver.pl /cluster/home/build/bin/scripts
+cp -p doSameSpeciesLiftOver.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/doSameSpeciesLiftOver.pl
+rm -f /cluster/home/build/bin/scripts/ensVersions
+echo cp -p ensVersions /cluster/home/build/bin/scripts
+cp -p ensVersions /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/ensVersions
+rm -f /cluster/home/build/bin/scripts/extractNestedRepeats.pl
+echo cp -p extractNestedRepeats.pl /cluster/home/build/bin/scripts
+cp -p extractNestedRepeats.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/extractNestedRepeats.pl
+rm -f /cluster/home/build/bin/scripts/extractGtf.pl
+echo cp -p extractGtf.pl /cluster/home/build/bin/scripts
+cp -p extractGtf.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/extractGtf.pl
+rm -f /cluster/home/build/bin/scripts/liftRMAlign.pl
+echo cp -p liftRMAlign.pl /cluster/home/build/bin/scripts
+cp -p liftRMAlign.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/liftRMAlign.pl
+rm -f /cluster/home/build/bin/scripts/makeDownloads.pl
+echo cp -p makeDownloads.pl /cluster/home/build/bin/scripts
+cp -p makeDownloads.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/makeDownloads.pl
+rm -f /cluster/home/build/bin/scripts/makeGenomeDb.pl
+echo cp -p makeGenomeDb.pl /cluster/home/build/bin/scripts
+cp -p makeGenomeDb.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/makeGenomeDb.pl
+rm -f /cluster/home/build/bin/scripts/makePushQSql.pl
+echo cp -p makePushQSql.pl /cluster/home/build/bin/scripts
+cp -p makePushQSql.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/makePushQSql.pl
+rm -f /cluster/home/build/bin/scripts/monthlyUpdateIgtc.csh
+echo cp -p monthlyUpdateIgtc.csh /cluster/home/build/bin/scripts
+cp -p monthlyUpdateIgtc.csh /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/monthlyUpdateIgtc.csh
+rm -f /cluster/home/build/bin/scripts/simplePartition.pl
+echo cp -p simplePartition.pl /cluster/home/build/bin/scripts
+cp -p simplePartition.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/simplePartition.pl
+rm -f /cluster/home/build/bin/scripts/partitionSequence.pl
+echo cp -p partitionSequence.pl /cluster/home/build/bin/scripts
+cp -p partitionSequence.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/partitionSequence.pl
+rm -f /cluster/home/build/bin/scripts/updateIgtc.pl
+echo cp -p updateIgtc.pl /cluster/home/build/bin/scripts
+cp -p updateIgtc.pl /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/updateIgtc.pl
+rm -f /cluster/home/build/bin/scripts/unigene.csh
+echo cp -p unigene.csh /cluster/home/build/bin/scripts
+cp -p unigene.csh /cluster/home/build/bin/scripts
+chmod +x /cluster/home/build/bin/scripts/unigene.csh
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/automation'
+cd buildReleaseLog && echo buildReleaseLog && make
+buildReleaseLog
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/buildReleaseLog'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o buildReleaseLog.o -c buildReleaseLog.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o htmlOut.o -c htmlOut.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/buildReleaseLog buildReleaseLog.o htmlOut.o   ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/buildReleaseLog
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/buildReleaseLog'
+cd checkUrlsInTable && echo checkUrlsInTable && make
+checkUrlsInTable
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/checkUrlsInTable'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o checkUrlsInTable.o -c checkUrlsInTable.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/checkUrlsInTable checkUrlsInTable.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/checkUrlsInTable
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/checkUrlsInTable'
+cd geoMirrorNode && echo geoMirrorNode && make
+geoMirrorNode
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/geoMirrorNode'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o geoMirrorNode.o -c geoMirrorNode.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/geoMirrorNode geoMirrorNode.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/geoMirrorNode
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/geoMirrorNode'
+cd makeTrackIndex && echo makeTrackIndex && make
+makeTrackIndex
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/makeTrackIndex'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o makeTrackIndex.o -c makeTrackIndex.c
+mkdir -p "/cluster/home/build/bin/x86_64"
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -o /cluster/home/build/bin/x86_64/makeTrackIndex makeTrackIndex.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/makeTrackIndex
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/makeTrackIndex'
+cd mysqlSecurityCheck && echo mysqlSecurityCheck && make
+mysqlSecurityCheck
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/mysqlSecurityCheck'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o mysqlSecurityCheck.o -c mysqlSecurityCheck.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/mysqlSecurityCheck mysqlSecurityCheck.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/mysqlSecurityCheck
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/mysqlSecurityCheck'
+cd pslUniq && echo pslUniq && make
+pslUniq
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslUniq'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o pslUniq.o -c pslUniq.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/pslUniq pslUniq.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/pslUniq
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslUniq'
+cd refSeqGet && echo refSeqGet && make
+refSeqGet
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/refSeqGet'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o refSeqVerInfo.o -c refSeqVerInfo.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o refSeqGet.o -c refSeqGet.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/refSeqGet refSeqVerInfo.o refSeqGet.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/refSeqGet
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/refSeqGet'
+cd safePush && echo safePush && make
+safePush
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/safePush'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o safePush.o -c safePush.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/safePush safePush.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/safePush
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/safePush'
+cd toDev64 && echo toDev64 && make
+toDev64
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/toDev64'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o toDev64.o -c toDev64.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/toDev64 toDev64.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/toDev64
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/toDev64'
+cd wigBedToStep && echo wigBedToStep && make
+wigBedToStep
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/wigBedToStep'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o wigBedToStep.o -c wigBedToStep.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/wigBedToStep wigBedToStep.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/wigBedToStep
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/wigBedToStep'
+cd bedExtendRanges && echo bedExtendRanges && make
+bedExtendRanges
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedExtendRanges'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o bedExtendRanges.o -c bedExtendRanges.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -o /cluster/home/build/bin/x86_64/bedExtendRanges bedExtendRanges.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a
+true /cluster/home/build/bin/x86_64/bedExtendRanges
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedExtendRanges'
+cd bedToPsl && echo bedToPsl && make
+bedToPsl
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedToPsl'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o bedToPsl.o -c bedToPsl.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/bedToPsl bedToPsl.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/bedToPsl
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedToPsl'
+cd bedWeedOverlapping && echo bedWeedOverlapping && make
+bedWeedOverlapping
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedWeedOverlapping'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o bedWeedOverlapping.o -c bedWeedOverlapping.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/bedWeedOverlapping bedWeedOverlapping.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/bedWeedOverlapping
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bedWeedOverlapping'
+cd bigMafToMaf && echo bigMafToMaf && make
+bigMafToMaf
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bigMafToMaf'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o bigMafToMaf.o -c bigMafToMaf.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/bigMafToMaf bigMafToMaf.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/bigMafToMaf
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bigMafToMaf'
+cd bigPslToPsl && echo bigPslToPsl && make
+bigPslToPsl
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bigPslToPsl'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o bigPslToPsl.o -c bigPslToPsl.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/bigPslToPsl bigPslToPsl.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/bigPslToPsl
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/bigPslToPsl'
+cd chromGraphFromBin && echo chromGraphFromBin && make
+chromGraphFromBin
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/chromGraphFromBin'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o chromGraphFromBin.o -c chromGraphFromBin.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/chromGraphFromBin chromGraphFromBin.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/chromGraphFromBin
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/chromGraphFromBin'
+cd chromGraphToBin && echo chromGraphToBin && make
+chromGraphToBin
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/chromGraphToBin'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o chromGraphToBin.o -c chromGraphToBin.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/chromGraphToBin chromGraphToBin.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/chromGraphToBin
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/chromGraphToBin'
+cd crTreeIndexBed && echo crTreeIndexBed && make
+crTreeIndexBed
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/crTreeIndexBed'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o crTreeIndexBed.o -c crTreeIndexBed.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/crTreeIndexBed crTreeIndexBed.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/crTreeIndexBed
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/crTreeIndexBed'
+cd crTreeSearchBed && echo crTreeSearchBed && make
+crTreeSearchBed
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/crTreeSearchBed'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o crTreeSearchBed.o -c crTreeSearchBed.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/crTreeSearchBed crTreeSearchBed.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/crTreeSearchBed
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/crTreeSearchBed'
+cd gapToLift && echo gapToLift && make
+gapToLift
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gapToLift'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o gapToLift.o -c gapToLift.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/gapToLift gapToLift.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/gapToLift
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gapToLift'
+cd genePredFilter && echo genePredFilter && make
+genePredFilter
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredFilter'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o genePredFilter.o -c genePredFilter.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/genePredFilter genePredFilter.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/genePredFilter
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredFilter'
+cd genePredToBigGenePred && echo genePredToBigGenePred && make
+genePredToBigGenePred
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredToBigGenePred'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o genePredToBigGenePred.o -c genePredToBigGenePred.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/genePredToBigGenePred genePredToBigGenePred.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/genePredToBigGenePred
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredToBigGenePred'
+cd genePredToProt && echo genePredToProt && make
+genePredToProt
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredToProt'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o genePredToProt.o -c genePredToProt.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/genePredToProt genePredToProt.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/genePredToProt
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/genePredToProt'
+cd gff3ToGenePred && echo gff3ToGenePred && make
+gff3ToGenePred
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gff3ToGenePred'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o gff3ToGenePred.o -c gff3ToGenePred.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/gff3ToGenePred gff3ToGenePred.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/gff3ToGenePred
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gff3ToGenePred'
+cd gff3ToPsl && echo gff3ToPsl && make
+gff3ToPsl
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gff3ToPsl'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o gff3ToPsl.o -c gff3ToPsl.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/gff3ToPsl gff3ToPsl.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/gff3ToPsl
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gff3ToPsl'
+cd gtfToGenePred && echo gtfToGenePred && make
+gtfToGenePred
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gtfToGenePred'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o gtfToGenePred.o -c gtfToGenePred.c
+mkdir -p "/cluster/home/build/bin/x86_64"
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -o /cluster/home/build/bin/x86_64/gtfToGenePred gtfToGenePred.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a
+true /cluster/home/build/bin/x86_64/gtfToGenePred
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/gtfToGenePred'
+cd hubCheck && echo hubCheck && make
+hubCheck
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/hubCheck'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o hubCheck.o -c hubCheck.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/hubCheck hubCheck.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /hive/groups/browser/hal/halRelease/lib/halMaf.a /hive/groups/browser/hal/halRelease/lib/halChain.a /hive/groups/browser/hal/halRelease/lib/halMaf.a /hive/groups/browser/hal/halRelease/lib/halLiftover.a /hive/groups/browser/hal/halRelease/lib/halLod.a /hive/groups/browser/hal/halRelease/lib/halLib.a /hive/groups/browser/hal/halRelease/lib/sonLib.a /hive/groups/browser/hal/halRelease/lib/libhdf5_cpp.a /hive/groups/browser/hal/halRelease/lib/libhdf5.a /hive/groups/browser/hal/halRelease/lib/libhdf5_hl.a  /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/hubCheck
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/hubCheck'
+cd hubPublicCheck && echo hubPublicCheck && make
+hubPublicCheck
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/hubPublicCheck'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o hubPublicCheck.o -c hubPublicCheck.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/hubPublicCheck hubPublicCheck.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/hubPublicCheck
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/hubPublicCheck'
+cd mafToBigMaf && echo mafToBigMaf && make
+mafToBigMaf
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/mafToBigMaf'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o mafToBigMaf.o -c mafToBigMaf.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/mafToBigMaf mafToBigMaf.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/mafToBigMaf
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/mafToBigMaf'
+cd makeTableList && echo makeTableList && make
+makeTableList
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/makeTableList'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o makeTableList.o -c makeTableList.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/makeTableList makeTableList.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/makeTableList
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/makeTableList'
+cd oligoMatch && echo oligoMatch && make
+oligoMatch
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/oligoMatch'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o oligoMatch.o -c oligoMatch.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/oligoMatch oligoMatch.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/oligoMatch
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/oligoMatch'
+cd overlapSelect && echo overlapSelect && make
+overlapSelect
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/overlapSelect'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o rowReader.o -c rowReader.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o chromAnn.o -c chromAnn.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o chromAnnMap.o -c chromAnnMap.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o selectTable.o -c selectTable.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o coordCols.o -c coordCols.c
+echo '/* GENERATED CODE, DO NOT EDIT */' > usage.msg.tmp
+/cluster/home/build/bin/x86_64/stringify usage.txt >> usage.msg.tmp
+mv -f usage.msg.tmp usage.msg
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o overlapSelect.o -c overlapSelect.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -o /cluster/home/build/bin/x86_64/overlapSelect rowReader.o chromAnn.o chromAnnMap.o selectTable.o coordCols.o  overlapSelect.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm
+true /cluster/home/build/bin/x86_64/overlapSelect
+rm -f usage.msg
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/overlapSelect'
+cd positionalTblCheck && echo positionalTblCheck && make
+positionalTblCheck
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/positionalTblCheck'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o positionalTblCheck.o -c positionalTblCheck.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/positionalTblCheck positionalTblCheck.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/positionalTblCheck
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/positionalTblCheck'
+cd pslToBigPsl && echo pslToBigPsl && make
+pslToBigPsl
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslToBigPsl'
+gcc -ggdb  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o pslToBigPsl.o -c pslToBigPsl.c
+gcc -ggdb -o /cluster/home/build/bin/x86_64/pslToBigPsl pslToBigPsl.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/pslToBigPsl
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslToBigPsl'
+cd pslMap && echo pslMap && make
+pslMap
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslMap'
+echo '/* GENERATED CODE, DO NOT EDIT */' > usage.msg.tmp
+/cluster/home/build/bin/x86_64/stringify usage.txt >> usage.msg.tmp
+mv -f usage.msg.tmp usage.msg
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o pslMap.o -c pslMap.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/pslMap pslMap.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/pslMap
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslMap'
+cd pslMapPostChain && echo pslMapPostChain && make
+pslMapPostChain
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslMapPostChain'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o pslMapPostChain.o -c pslMapPostChain.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/pslMapPostChain pslMapPostChain.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/pslMapPostChain
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/pslMapPostChain'
+cd tdbQuery && echo tdbQuery && make
+tdbQuery
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/tdbQuery'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o tdbQuery.o -c tdbQuery.c
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o tdbRecord.o -c tdbRecord.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/tdbQuery tdbQuery.o tdbRecord.o ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a -lm -lz
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/tdbQuery'
+cd transMapPslToGenePred && echo transMapPslToGenePred && make
+transMapPslToGenePred
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/transMapPslToGenePred'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o transMapPslToGenePred.o -c transMapPslToGenePred.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/transMapPslToGenePred transMapPslToGenePred.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/transMapPslToGenePred
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/transMapPslToGenePred'
+cd twoBitMask && echo twoBitMask && make
+twoBitMask
+make[1]: Entering directory `/hive/groups/browser/newBuild/kent/src/hg/utils/twoBitMask'
+gcc -O -g  -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -DMACHTYPE_x86_64 -DUSE_HAL -DUSE_GBIB_PWD   -Wall -Werror -Wformat -Wformat-security -Wimplicit -Wreturn-type -Wempty-body -Wunused-but-set-variable -Wuninitialized -I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../inc -I../../../htslib -I/hive/groups/browser/hal/halRelease/inc -I/include -I/usr/include/libpng12 -I/hive/groups/browser/gbib/  -o twoBitMask.o -c twoBitMask.c
+gcc -O -g -o /cluster/home/build/bin/x86_64/twoBitMask twoBitMask.o    ../../../lib/x86_64/jkhgap.a ../../../lib/x86_64/jkweb.a /usr/lib64/libssl.a /usr/lib64/libcrypto.a /usr/lib64/mysql/libmysqlclient.a -lkrb5 /usr/lib/gcc/x86_64-redhat-linux/4.4.4/libstdc++.a /usr/lib/debug/usr/lib64/librt.a ../../../htslib/libhts.a -pthread -L/lib /usr/lib64/libssl.a /usr/lib64/libcrypto.a -lkrb5 -L/usr/lib64 -lpng12 -lz -lm
+true /cluster/home/build/bin/x86_64/twoBitMask
+make[1]: Leaving directory `/hive/groups/browser/newBuild/kent/src/hg/utils/twoBitMask'
+chmod +x dbNsfpToBed.pl
+rm -f /cluster/home/build/bin/scripts/dbNsfpToBed.pl
+cp -p dbNsfpToBed.pl /cluster/home/build/bin/scripts/dbNsfpToBed.pl
+chmod +x dumpDb.pl
+rm -f /cluster/home/build/bin/scripts/dumpDb.pl
+cp -p dumpDb.pl /cluster/home/build/bin/scripts/dumpDb.pl
+chmod +x mergeOverlapBed4.pl
+rm -f /cluster/home/build/bin/scripts/mergeOverlapBed4.pl
+cp -p mergeOverlapBed4.pl /cluster/home/build/bin/scripts/mergeOverlapBed4.pl
+chmod +x mergeSortedBed3Plus.pl
+rm -f /cluster/home/build/bin/scripts/mergeSortedBed3Plus.pl
+cp -p mergeSortedBed3Plus.pl /cluster/home/build/bin/scripts/mergeSortedBed3Plus.pl
+chmod +x vai.pl
+rm -f /cluster/home/build/bin/scripts/vai.pl
+cp -p vai.pl /cluster/home/build/bin/scripts/vai.pl
