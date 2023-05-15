@@ -1407,6 +1407,9 @@ if (cfgOptionBooleanDefault("suppressVeryEarlyErrors", FALSE))
     htmlSuppressErrors();
 setUdcCacheDir();
 
+netSetTimeoutErrorMsg("A connection timeout means that either the server is offline or its firewall, the UCSC firewall or any router between the two blocks the connection.");
+
+
 struct cart *cart;
 struct sqlConnection *conn = cartDefaultConnector();
 char *ex;
@@ -2810,10 +2813,13 @@ if (parentLevel)
 for ( ; tdb != NULL; tdb = tdb->parent)
     {
     char buf[512];
+    char *trackName = tdb->track;
+    if (tdb->originalTrack)
+        trackName = tdb->originalTrack;
     if (suffix[0] == '.' || suffix[0] == '_')
-        safef(buf, sizeof buf, "%s%s", tdb->track,suffix);
+        safef(buf, sizeof buf, "%s%s", trackName,suffix);
     else
-        safef(buf, sizeof buf, "%s.%s", tdb->track,suffix);
+        safef(buf, sizeof buf, "%s.%s", trackName,suffix);
     char *cartSetting = hashFindVal(cart->hash, buf);
     if (cartSetting != NULL)
         {
