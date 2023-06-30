@@ -456,6 +456,23 @@ if(!webInTextMode)
     }
 }
 
+void webEndExtra(char *footer)
+/* output the footer of the HTML page with extra footer as desired */
+{
+if(!webInTextMode)
+    {
+    webEndSectionTables();
+#ifndef GBROWSE
+    googleAnalytics();
+#endif /* GBROWSE */
+    jsInlineFinish();
+    if (footer)
+	puts(footer);
+    puts( "</BODY></HTML>");
+    webPopErrHandlers();
+    }
+}
+
 static void webStartGbOptionalBanner(struct cart *cart, char *db, char *title, boolean doBanner, 
                                 boolean hgGateway)
 /* Start HTML with new header and footer design by JWest.  
@@ -1235,6 +1252,7 @@ return fullDirName;
 char *webCssLink(char *fileName, boolean mustExist)
 /* alternative for webTimeStampedLinkToResource for CSS files: returns a string with a time-stamped
  * link to a CSS file as a html fragment <link .... >. returns empty string if file does not exist.
+ * errAborts if mustExist is True.
  * */
 {
 // construct the absolute path to the file on disk
@@ -1246,8 +1264,7 @@ struct dyString *htmlFrag = NULL;
 if (!fileExists(dyStringContents(absFileName)))
     {
     if (mustExist)
-        errAbort("webTimeStampedLinkToResource: file: %s doesn't exist.\n", 
-                dyStringContents(absFileName));
+        errAbort("webCssLink: file: %s doesn't exist.\n", dyStringContents(absFileName));
     else
         htmlFrag = dyStringNew(0);
     }
@@ -1260,7 +1277,7 @@ else
 
 dyStringFree(&absFileName);
 dyStringFree(&absDir);
-return dyStringContents(htmlFrag);
+return dyStringCannibalize(&htmlFrag);
 }
 
 char *webTimeStampedLinkToResource(char *fileName, boolean wrapInHtml)

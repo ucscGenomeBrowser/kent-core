@@ -83,6 +83,7 @@ UTILS_APPLIST = \
 	pslMap \
 	pslMapPostChain \
 	pslPosTarget \
+	pslProtToRnaCoords \
 	pslRc \
 	pslRemoveFrameShifts \
 	pslScore \
@@ -209,7 +210,6 @@ SCRIPT_FILES = \
 	bedAppendPaperInfo \
 	googleSheetToBigBed \
 	doClinvarLift \
-	hubPublicMail \
 	browserRace \
 	${USER_APP_SCRIPTS}
 
