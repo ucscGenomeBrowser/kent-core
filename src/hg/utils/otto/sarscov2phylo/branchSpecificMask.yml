@@ -86,6 +86,11 @@ BA.2.75:
                   # BA.2.75-defining, bad but maybe not quite as bad:
                   T3796C, T3927C, T5183C, G12444A, A15451G, G22190A, A22331G, A22898G,
                   G22942T, C23013A ]
+    # False muts in re-placed (from BA.5) recombinants:
+    # XBD: A26275G
+    # XBP: G22331A, G22577C, G22898A, A26275G
+    # XBR: A22190G, G22331A, G22577C, G22898A, A26275G
+    # XBS: A22190G, G22331A, G22577C, G22898A, A26275G
 
 BN.1.2.3:
     # Inherits from BA.2.75
@@ -105,6 +110,11 @@ BA.5:
     # Some of these should be reverted in recombinants, but we're pretty much past the point of
     # simultaneous Delta/Omicron and the noise from false reversions is so intolerable that we'll
     # just have to watch out for missing reversions when working with recombinants.
+    # False muts in recombinants that were later re-placed in BA.2.75:
+    # XBD: G12160A, T22917G, T23018G
+    # XBP: G12160A,
+    # XBR: G12160A
+    # XBS: G12160A
     reversions: [ G670T, T2790C, T3037C, A4184G, T4321C, G9424A, T9534C, T10198C, A12160G,
                   T15714C, T17410C, G18163A, T19955C, G20055A, T21618C, G22200T, A22578G,
                   T22674C, C22679T, T22686C, G22688A, A22775G, T22813G, G22882T, G22917T,
@@ -128,6 +138,10 @@ XBB:
     # Inherits from BA.2
     # Lots of false reversions; I would also mask G405A except that would be wrong for XBN.
     representative: BGD/icddrb_TND_06_1053/2022
+    # Homopolymer run 21999-22005 causes big trouble for Ion Torrent & nanopore, leading to false
+    # substitutions in 21994, 21995 and 21998 as discussed in pango-designation issues 1882, 1503,
+    # 1999, 1918.  21998 in particular crops up a lot, all over XBB, interfering with many sublins.
+    sites: [ 21994, 21995, 21998 ]
     reversions: [ T2790C, T3037C, A4184G, T4321C, T9344C, G9424A, T10198C, C17859T, G19326A,
                   T21618C, C21810T, A22000C, G22109C, C22577G, A22578G, C22599G, A22664C, C22679T,
                   T22686C, G22688A, T22813G, C22895G, C22896T, A22898G, G22942T, A22992G, A22995C,
@@ -143,7 +157,7 @@ XBB.1:
 XBB.1.5:
     # Inherits from XBB.1
     # Don't believe reversions on 27915 once we're as far as XBB.1.*
-    representative: England/BRBR-326C0A5A/2023
+    representative: England/BRBR-32671539/2023
     reversions: [ T27915G ]
 
 XBC:
