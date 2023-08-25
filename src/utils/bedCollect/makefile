@@ -1,3 +1,3 @@
 kentSrc = ../..
-A = hgTablesTest
+A = bedCollect
 include $(kentSrc)/inc/userApp.mk
