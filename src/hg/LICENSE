@@ -1,18 +1,20 @@
-LicenceRef-proprietary=https://genome.ucsc.edu/license
+MIT License
 
-Source code under this directory is under the MIT license (see kent/LICENSE), 
-WITH THE EXCEPTION of the following subdirectories:
+Copyright (C) 2015-2017 UC Regents
 
-   cgilib hgApi hgCollection hgFileSearch hgFileUi hgGateway hgGene
-   hgGenome hgIntegrator hgPal hgPcr hgPhyloPlace hgPublicSessions hgSession
-   hgSuggest hgTables hgTrackUi hgTracks hgVai hgc hubApi near visiGene liftOver
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The Genome Browser binaries and source code in these directories and subdirectories
-are freely available for academic, nonprofit, and personal use. A license is
-required for commercial download and installation of all software in this directory.
-Redistribution or modification of files in these subdirectories is not allowed.
-See https://genome.ucsc.edu/license/
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-To purchase a commercial license for Genome Browser source code, LiftOver,
-GBiB, or GBiC, please visit the Genome Browser store: https://genome-store.ucsc.edu/
-If you have any questions, please contact our licensing department via https://genome.ucsc.edu/license/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
