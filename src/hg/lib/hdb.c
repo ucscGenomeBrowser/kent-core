@@ -1458,16 +1458,16 @@ char *hReplaceGbdb(char* fileName)
 {
 if (fileName == NULL)
     return fileName;
-if (!startsWith("/gbdb/", fileName))
+
+// if the gbdbLoc2 system is not used at all, like on the RR, stop now. 
+// This is important, as we would be doing tens of thousands of stats
+// otherwise on the RR when going over trackDb.
+char* newGbdbLoc = cfgOption("gbdbLoc2");
+if (newGbdbLoc == NULL || !startsWith("/gbdb/", fileName))
     return cloneString(fileName);
 
 char *path = hReplaceGbdbLocal(fileName);
 if (fileExists(path))
-    return path;
-
-// if the file did not exist, replace with gbdbLoc2
-char* newGbdbLoc = cfgOption("gbdbLoc2");
-if (newGbdbLoc==NULL)
     return path;
 
 freeMem(path);
@@ -3959,8 +3959,10 @@ static void addTrackIfDataAccessible(char *database, struct trackDb *tdb,
 	       boolean privateHost, struct trackDb **tdbRetList)
 /* check if a trackDb entry should be included in display, and if so
  * add it to the list, otherwise free it */
+/* NOTE: we no longer check to see if the data is available in CGIs
+ * since this is done by hTrackDb at trackDb build time */
 {
-if ((!tdb->private || privateHost) && trackDataAccessible(database, tdb))
+if (!tdb->private || privateHost)
     slAddHead(tdbRetList, tdb);
 else if (tdbIsDownloadsOnly(tdb))
     {
