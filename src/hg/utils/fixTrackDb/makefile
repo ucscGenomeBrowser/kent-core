@@ -1,3 +1,3 @@
-kentSrc = ../..
-A = bedCollect
+kentSrc = ../../..
+A = fixTrackDb
 include $(kentSrc)/inc/userApp.mk

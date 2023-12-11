@@ -788,7 +788,7 @@ centralDb = cfgOption2(centralProfile, "db");
 centralCc = sqlConnCacheNewProfile(centralProfile);
 sqlSetParanoid(TRUE);
 struct sqlConnection *conn = sqlConnCacheMayAlloc(centralCc, centralDb);
-if ((conn == NULL) || !cartTablesOk(conn))
+if ((conn == NULL) || (cgiIsOnWeb() && !cartTablesOk(conn)))
     {
     fprintf(stderr, "hConnectCentral failed over to backupcentral "
             "pid=%ld\n", (long)getpid());
@@ -1105,7 +1105,7 @@ return ci->size;
 void hNibForChrom(char *db, char *chromName, char retNibName[HDB_MAX_PATH_STRING])
 /* Get .nib file associated with chromosome. */
 {
-if (cfgOptionBooleanDefault("forceTwoBit", FALSE) == TRUE && !trackHubDatabase(db))
+if (cfgOptionBooleanDefault("forceTwoBit", TRUE) == TRUE && !trackHubDatabase(db))
     {
     char buf[HDB_MAX_PATH_STRING];
     safef(buf, HDB_MAX_PATH_STRING, "/gbdb/%s/%s.2bit", db, db);
@@ -1471,10 +1471,13 @@ char *path = hReplaceGbdbLocal(fileName);
 if (fileExists(path))
     return path;
 
-freeMem(path);
-path = replaceChars(fileName, "/gbdb/", newGbdbLoc2);
-if (cfgOptionBooleanDefault("traceGbdb", FALSE))
-    fprintf(stderr, "REDIRECT gbdbLoc2 %s ", path);
+if (newGbdbLoc2!=NULL)
+    {
+    freeMem(path);
+    path = replaceChars(fileName, "/gbdb/", newGbdbLoc2);
+    if (cfgOptionBooleanDefault("traceGbdb", FALSE))
+        fprintf(stderr, "REDIRECT gbdbLoc2 %s ", path);
+    }
 
 return path;
 }
@@ -3845,7 +3848,7 @@ if (tdb->restrictCount > 0 && chrom != NULL)
 return chromOk;
 }
 
-static boolean loadOneTrackDb(char *db, char *where, char *tblSpec,
+boolean loadOneTrackDb(char *db, char *where, char *tblSpec,
                               struct trackDb **tdbList, struct hash *loaded)
 /* Load a trackDb table, including handling profiles:tbl. Returns
  * TRUE if table exists */
@@ -3880,7 +3883,7 @@ hFreeConn(&conn);
 return exists;
 }
 
-static struct trackDb *loadTrackDb(char *db, char *where)
+struct trackDb *loadTrackDb(char *db, char *where)
 /* Load each trackDb table.  Will put supertracks in parent field of given tracks but
  * these are still in track list. */
 {
@@ -5845,6 +5848,16 @@ return (hTableExists(db, "ncbiRefSeq") && hTableExists(db, "ncbiRefSeqPsl") &&
         hTableExists(db, "ncbiRefSeqCds") && hTableExists(db, "ncbiRefSeqLink") &&
         hTableExists(db, "ncbiRefSeqPepTable") &&
         hTableExists(db, "seqNcbiRefSeq") && hTableExists(db, "extNcbiRefSeq"));
+}
+
+boolean hDbHasNcbiRefSeqHistorical(char *db)
+/* Return TRUE if db has NCBI's Historical RefSeq alignments and annotations. */
+{
+// hTableExists() caches results so this shouldn't make for loads of new SQL queries if called
+// more than once.
+return (hTableExists(db, "ncbiRefSeqHistorical") && hTableExists(db, "ncbiRefSeqPslHistorical") &&
+        hTableExists(db, "ncbiRefSeqCdsHistorical") && hTableExists(db, "ncbiRefSeqLinkHistorical") &&
+        hTableExists(db, "seqNcbiRefSeqHistorical") && hTableExists(db, "extNcbiRefSeqHistorical"));
 }
 
 char *hRefSeqAccForChrom(char *db, char *chrom)
