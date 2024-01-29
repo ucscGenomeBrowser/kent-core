@@ -742,7 +742,7 @@ function installRedhat () {
         yum -y install epel-release
     fi
 
-    yum -y install ghostscript rsync ImageMagick R-core curl
+    yum -y install ghostscript rsync ImageMagick R-core curl initscripts --allowerasing
 
     # centos 7 does not provide libpng by default
     if ldconfig -p | grep libpng12.so > /dev/null; then
@@ -819,6 +819,7 @@ function installRedhat () {
         fi
             
         # start mysql on boot
+        yum -y install chkconfig
         chkconfig --level 2345 $MYSQLD on 
 
         # make sure that missing values in Mysql insert statements do not trigger errors, #18368: deactivate strict mode
@@ -998,6 +999,9 @@ function installDebian ()
        apt-get update
        touch /tmp/browserSetup.aptGetUpdateDone
     fi
+
+    # the new tzdata package comes up interactive questions, suppress these
+    export DEBIAN_FRONTEND=noninteractive
 
     echo2 Installing ghostscript and imagemagick
     waitKey
@@ -1385,6 +1389,8 @@ function installBrowser ()
 {
     if [ -f $COMPLETEFLAG ]; then
         echo2 error: the file $COMPLETEFLAG exists. It seems that you have installed the browser already.
+        echo2 If you want to reset the Apache directory, you can run '"rm -rf /usr/local/apache"' and 
+        echo2 then run this script again.
         exit 100
     fi
 
@@ -1704,6 +1710,8 @@ function stopMysql
             service mysql stop
     elif [ -f /etc/init.d/mysqld ]; then 
             service mysqld stop
+    elif [ -f /etc/init.d/mariadb ]; then 
+            service mariadb stop
     elif [ -f /usr/lib/systemd/system/mariadb.service ]; then
             # RHEL 7, etc use systemd instead of SysV
             systemctl stop mariadb
@@ -1722,6 +1730,8 @@ function startMysql
             service mysql start
     elif [ -f /etc/init.d/mysqld ]; then 
             service mysqld start
+    elif [ -f /etc/init.d/mariadb ]; then 
+            service mariadb start
     elif [ -f /usr/lib/systemd/system/mariadb.service ]; then
             # RHEL 7, etc use systemd instead of SysV
             systemctl start mariadb
