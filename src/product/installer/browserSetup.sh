@@ -6,7 +6,7 @@
 # you can easily debug this script with 'bash -x browserSetup.sh', it 
 # will show all commands then
 
-exec > >(tee -a "${HOME}/browserSetup.sh") 2>&1
+exec > >(tee -a "${HOME}/browserSetup.log") 2>&1
 
 set -u -e -o pipefail # fail on unset vars and all errors, also in pipes
 
@@ -370,6 +370,11 @@ command is one of:
                downloaded on-the-fly from UCSC.
   mirror     - download a full assembly (also see the -t option below).
                After completion, no data is downloaded on-the-fly from UCSC.
+  offline    - put the browser offline, so no more loading of missing tables
+               from UCSC on-the-fly. Much faster, but depending on how much
+               you downloaded, means that you have many fewer tracks available.
+  online     - put the browser online, so any missing files and tracks are
+               loaded on-the-fly from UCSC.
   update     - update the genome browser software and data, updates
                all tables of an assembly, like "mirror"
   cgiUpdate  - update only the genome browser software, not the data. Not 
@@ -381,6 +386,10 @@ command is one of:
                bedSort, ... to /usr/local/bin
                This has to be run after the browser has been installed, other-
                wise these packages may be missing: libpng zlib libmysqlclient
+  dev        - install git/gcc/c++/freetype/etc, clone the kent repo into
+               ~/kent and build the CGIs into /usr/local/apache so you can try
+               them right away. Useful if you want to develop your own track 
+               types.
   mysql      - Patch my.cnf and recreate Mysql users. This can fix
                a broken Mysql server after an update to Mysql 8. 
                
@@ -742,7 +751,7 @@ function installRedhat () {
         yum -y install epel-release
     fi
 
-    yum -y install ghostscript rsync ImageMagick R-core curl initscripts --allowerasing
+    yum -y install ghostscript rsync ImageMagick R-core curl initscripts --allowerasing --nobest
 
     # centos 7 does not provide libpng by default
     if ldconfig -p | grep libpng12.so > /dev/null; then
@@ -750,6 +759,11 @@ function installRedhat () {
     else
         yum -y install libpng12
     fi
+    
+    # try to activate the powertools repo. Exists on CentOS and Rocky but not Redhat
+    set +o pipefail
+    yum config-manager --set-enabled powertools || true
+    set -o pipefail
     
     # install apache if not installed yet
     if [ ! -f /usr/sbin/httpd ]; then
@@ -1010,19 +1024,25 @@ function installDebian ()
     # r-base-core for the gtex tracks
     # python-mysqldb for hgGeneGraph
     apt-get --no-install-recommends --assume-yes install ghostscript imagemagick wget rsync r-base-core curl gsfonts
-    # python-mysqldb has been removed in newer distros
+    # python-mysqldb has been removed in almost all distros as of 2021
     if apt-cache policy python-mysqldb | grep "Candidate: .none." > /dev/null; then 
 	    echo2 The package python-mysqldb is not available anymore. Working around it
 	    echo2 by installing python2 and MySQL-python with pip2
-            apt-get install --assume-yes python2 libmysqlclient-dev python2-dev wget gcc
-	    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py
-	    python2 /tmp/get-pip.py
-            if [ -f /usr/include/mysql/my_config.h ]; then
-                    echo my_config.h found
-            else
-                wget https://raw.githubusercontent.com/paulfitz/mysql-connector-c/master/include/my_config.h -P /usr/include/mysql/
-            fi
-            pip2 install MySQL-python
+	    if apt-cache policy python2 | grep "Candidate: .none." > /dev/null; then 
+               # Ubuntu >= 21 does not have python2 anymore - hgGeneGraph has been ported, so not an issue anymore
+   	       echo2 Python2 package is not available either for this distro, so not installing Python2 at all.
+	    else
+               # workaround for Ubuntu 16-20 - keeping this section for a few years, just in case
+               apt-get install --assume-yes python2 libmysqlclient-dev python2-dev wget gcc
+    	       curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py
+    	       python2 /tmp/get-pip.py
+               if [ -f /usr/include/mysql/my_config.h ]; then
+                   echo my_config.h found
+               else
+                   wget https://raw.githubusercontent.com/paulfitz/mysql-connector-c/master/include/my_config.h -P /usr/include/mysql/
+               fi
+               pip2 install MySQL-python
+	    fi
     else
 	    apt-get --assume-yes install python-mysqldb
     fi
@@ -1382,6 +1402,32 @@ function mysqlDbSetup ()
     $MYSQL -e 'CREATE DATABASE IF NOT EXISTS hg18'
     
     $MYSQL -e "FLUSH PRIVILEGES;"
+}
+
+# set this machine for browser development: install required tools, clone the tree, build it
+function buildTree () 
+{
+   echo2 Installing required linux packages from repositories: Git, GCC, G++, Mysql-client-libs, uuid, etc
+   waitKey
+   if [[ "$DIST" == "debian" ]]; then
+      apt-get install make git gcc g++ libpng-dev libmysqlclient-dev uuid-dev libfreetype-dev
+   elif [[ "$DIST" == "redhat" ]]; then
+      yum install -y git vim gcc gcc-c++ make libpng-devel libuuid-devel freetype-devel
+   else 
+      echo Error: Cannot identify linux distribution
+      exit 100
+   fi
+
+   echo2 Cloning kent repo into ~/kent using git with --depth=1
+   waitKey
+   cd ~
+   git clone https://github.com/ucscGenomeBrowser/kent.git --depth=1
+
+   echo2 Now building CGIs from ~/kent to /usr/local/apache/cgi-bin 
+   echo2 Copying JS/HTML/CSS to /usr/local/apache/htdocs
+   waitKey
+   cd ~/kent/src
+   make -j8 cgi-alpha
 }
 
 # main function, installs the browser on Redhat/Debian and potentially even on OSX
@@ -2110,8 +2156,17 @@ elif [ "${1:-}" == "addTools" ]; then
 elif [ "${1:-}" == "mysql" ]; then
     mysqlDbSetup
 
+elif [ "${1:-}" == "online" ]; then
+    goOnline
+
+elif [ "${1:-}" == "offline" ]; then
+    goOffline
+
+elif [ "${1:-}" == "dev" ]; then
+    buildTree 
+
 else
-   echo Unknown command: $1
+   echo Unknown command: ${1:-}
    echo "$HELP_STR"
    exit 100
 fi
