@@ -34,6 +34,42 @@ else
   IS_HGWDEV = no
 endif
 
+# for Darwin (Mac OSX), use static libs when they can be found
+ifeq ($(UNAME_S),Darwin)
+  ifneq ($(wildcard /opt/local/include/openssl/ssl.h),)
+    HG_INC += -I/opt/local/include
+  endif
+  ifneq ($(wildcard /opt/local/lib/libz.a),)
+    ZLIB = /opt/local/lib/libz.a
+  endif
+  ifneq ($(wildcard /opt/local/lib/libpng.a),)
+    PNGLIB = /opt/local/lib/libpng.a
+  endif
+  ifneq ($(wildcard /opt/local/lib/libfreetype.a),)
+    FREETYPELIBS = /opt/local/lib/libfreetype.a /opt/local/lib/libbz2.a /opt/local/lib/libbrotlidec.a /opt/local/lib/libbrotlicommon.a
+  endif
+  ifneq ($(wildcard /usr/local/opt/openssl@3/lib/libssl.a),)
+    SSLLIB = /usr/local/opt/openssl@3/lib/libssl.a
+  else
+    ifneq ($(wildcard /opt/local/libexec/openssl3/lib/libssl.a),)
+      SSLLIB = /opt/local/libexec/openssl3/lib/libssl.a
+    endif
+  endif
+  ifneq ($(wildcard /usr/local/opt/openssl@3/lib/libcrypto.a),)
+    CRYPTOLIB = /usr/local/opt/openssl@3/lib/libcrypto.a
+  else
+    ifneq ($(wildcard /opt/local/libexec/openssl3/lib/libcrypto.a),)
+      CRYPTOLIB = /opt/local/libexec/openssl3/lib/libcrypto.a
+    endif
+  endif
+  ifneq ($(wildcard /opt/local/lib/libiconv.a),)
+    ICONVLIB = /opt/local/lib/libiconv.a
+  endif
+  ifneq ($(wildcard /opt/homebrew/lib/libmysqlclient.a),)
+    MYSQLLIBS = /opt/homebrew/lib/libmysqlclient.a
+  endif
+endif
+
 # Skip freetype for conda build; not needed for utils, and the Mac build environment has
 # freetype installed but we don't want to use the system libraries because they can be
 # for a newer OSX version than the conda build target, and can be incompatible.
@@ -67,7 +103,6 @@ ifneq (${CONDA_BUILD},1)
   L += ${FREETYPELIBS}
 endif
 
-
 ifeq (${HOSTNAME},cirm-01)
   FULLWARN = yes
 endif
@@ -76,14 +111,12 @@ ifeq (${PTHREADLIB},)
   PTHREADLIB=-lpthread
 endif
 
-# required extra library on Mac OSX
-ICONVLIB=
-
-# pthreads is required
 ifneq ($(UNAME_S),Darwin)
   L+=${PTHREADLIB}
 else
-  ICONVLIB=-liconv
+  ifeq (${ICONVLIB},)
+    ICONVLIB=-liconv
+  endif
 endif
 
 # autodetect UCSC installation of hal:
@@ -207,7 +240,19 @@ else
    ifeq (${CONDA_BUILD},1)
        L+=${PREFIX}/lib/libssl.a ${PREFIX}/lib/libcrypto.a -ldl
    else
-       L+=-lssl -lcrypto -ldl
+       ifneq (${SSLLIB},)
+          L+=${SSLLIB}
+       else
+          L+=-lssl
+       endif
+       ifneq (${CRYPTOLIB},)
+          L+=${CRYPTOLIB}
+       else
+          L+=-lcrypto -ldl
+       endif
+       ifeq (${DLLIB},)
+          L+=-ldl
+       endif
    endif
 endif
 
