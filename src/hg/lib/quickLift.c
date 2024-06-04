@@ -47,7 +47,10 @@ struct bigBedInterval *quickLiftIntervals(char *quickLiftFile, struct bbiFile *b
 {
 char *linkFileName = getLinkFile(quickLiftFile);
 // need to add some padding to these coordinates
-struct chain *chain, *chainList = chainLoadIdRangeHub(NULL, quickLiftFile, linkFileName, chrom, start-100000, end+100000, -1);
+int padStart = start - 100000;
+if (padStart < 0)
+    padStart = 0;
+struct chain *chain, *chainList = chainLoadIdRangeHub(NULL, quickLiftFile, linkFileName, chrom, padStart, end+100000, -1);
 struct lm *lm = lmInit(0);
 struct bigBedInterval *bbList = NULL;
 
@@ -90,6 +93,15 @@ for(chain = chainList; chain; chain = chain->next)
 return bbList;
 }
 
+void make12(struct bed *bed)
+{
+bed->blockCount = 1;
+bed->blockSizes = needMem(sizeof(int));
+bed->blockSizes[0] = bed->chromEnd - bed->chromStart;
+bed->chromStarts = needMem(sizeof(int));
+bed->chromStarts[0] = 0;
+}
+
 struct bed *quickLiftBed(struct bbiFile *bbi, struct hash *chainHash, struct bigBedInterval *bb)
 /* Using chains stored in chainHash, port a bigBedInterval from another assembly to a bed
  * on the reference.
@@ -107,6 +119,9 @@ bigBedIntervalToRow(bb, chromName, startBuf, endBuf, bedRow, ArraySize(bedRow));
 
 struct bed *bed = bedLoadN(bedRow, bbi->definedFieldCount);
 char *error;
+if (bbi->definedFieldCount < 12)
+    make12(bed);
+
 if ((error = remapBlockedBed(chainHash, bed, 0.0, 0.1, TRUE, TRUE, NULL, NULL)) == NULL)
     return bed;
 //else

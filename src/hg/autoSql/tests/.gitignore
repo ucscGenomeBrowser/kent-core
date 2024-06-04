@@ -1,0 +1,6 @@
+output
+dbLinkTest
+testHarness
+mainTest.*
+newTest.*
+jsonTest

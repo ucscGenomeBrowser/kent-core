@@ -12,7 +12,7 @@ filterChain=$pairRefSeq.$pairQuerySeq.$pairChain
 
 chainFilter -t=$pairRefSeq -q=$pairQuerySeq $pairChain > $filterChain
 
-buildPairAssembly $filterChain $pairRefSeq $pairRefDb2bit $pairQuerySeq $pairQueryDb2bit out.fa query.psl target.psl map.bed
+buildPairAssembly $filterChain $pairRefSeq $pairRefDb2bit $pairQuerySeq $pairQueryDb2bit out.fa query.psl target.psl map.bed dup.bed miss.bed baseTarget.bed baseQuery.bed synBlocks.bed
 
 
 rm -rf hub
@@ -20,7 +20,7 @@ mkdir hub
 
 faToTwoBit out.fa hub/buildPair.2bit
 twoBitInfo hub/buildPair.2bit hub/buildPair.sizes.txt
-bedToBigBed  map.bed hub/buildPair.sizes.txt hub/map.bb
+bedToBigBed  -type=bed9+4 map.bed hub/buildPair.sizes.txt hub/map.bb
 
 axtChain -psl -linearGap=medium query.psl hub/buildPair.2bit $pairQueryDb2bit query.chain
 hgLoadChain -noBin -test hg38 bigChain  query.chain
@@ -36,6 +36,53 @@ bedToBigBed -type=bed6+6 -as=$HOME/kent/src/hg/lib/bigChain.as -tab targetChain.
 awk 'BEGIN {OFS="\t"} {print $1, $2, $3, $5, $4}' link.tab | sort -k1,1 -k2,2n > bigChain.bigLink
 bedToBigBed -type=bed4+1 -as=$HOME/kent/src/hg/lib/bigLink.as -tab bigChain.bigLink hub/buildPair.sizes.txt hub/targetChain.link.bb
 
+chainSwap query.chain swap.query.chain
+chainSwap target.chain swap.target.chain
+awk '{print $1,$2,$3,$7}' dup.bed | liftOver -minMatch=0.001 stdin swap.query.chain tmp foo
+awk '{print $4,$5,$6,$7}' dup.bed | liftOver -minMatch=0.001 stdin swap.target.chain tmp2 foo
+sort tmp tmp2 > tmp3
+bedToBigBed -type=bed4 -tab tmp3 hub/buildPair.sizes.txt hub/dups.bb
+
+bedToBigBed -type=bed4 miss.bed hub/buildPair.sizes.txt hub/mismatch.bb
+
+bedToBigBed -type=bed4+1 baseTarget.bed hub/buildPair.sizes.txt hub/baseTarget.bb
+
+bedToBigBed -type=bed4+1 baseQuery.bed hub/buildPair.sizes.txt hub/baseQuery.bb
+
+sort -k1,1 -k2,2n synBlocks.bed > sorted.bed
+bedToBigBed -type=bed4 sorted.bed hub/buildPair.sizes.txt hub/synBlocks.bb
+
+genome=$pairQueryDb
+gcX="${genome:0:3}"
+d0="${genome:4:3}"
+d1="${genome:7:3}"
+d2="${genome:10:3}"
+
+tmp=`cd /usr/local/apache/htdocs/hubs; echo $gcX/$d0/$d1/$d2/$genome/bbi/*ens*.bb `
+ensGeneBb=https://hgdownload.soe.ucsc.edu/hubs/$tmp
+tmp=`cd /usr/local/apache/htdocs/hubs; echo $gcX/$d0/$d1/$d2/$genome/bbi/*rmsk.bb `
+rmskBb=https://hgdownload.soe.ucsc.edu/hubs/$tmp
+tmp=`cd /usr/local/apache/htdocs/hubs; echo $gcX/$d0/$d1/$d2/$genome/bbi/*simpleRepeat.bb `
+simpleBb=https://hgdownload.soe.ucsc.edu/hubs/$tmp
+
+
+cat << _EOF_ > hub/groups.txt
+name map
+label Mapping
+priority 2
+defaultIsClosed 0
+
+name target
+label From $pairRefDb
+priority 3
+defaultIsClosed 0
+
+name query
+label From $pairQueryDb
+priority 3
+defaultIsClosed 0
+_EOF_
+
 cat << _EOF_ > hub/hub.txt
 hub buildPair
 longLabel buildPair
@@ -43,29 +90,33 @@ email braney@ucsc.edu
 shortLabel buildPair
 useOneFile on
 
-genome buildPair
-defaultPos buildPair:1-2
-organism buildPair
+genome $pairRefSeq-$pairQuerySeq
+defaultPos buildPair:1-20000
+organism $pairRefDb-$pairQueryDb
 twoBitPath buildPair.2bit
+groups groups.txt
 
 track map
 type bigBed 9
 bigDataUrl map.bb
-shortLabel map
-longLabel map
+shortLabel Origin
+longLabel Origin
 itemRgb on
+group map
 
 track queryChain
 type bigChain $pairQueryDb
 bigDataUrl queryChain.bb
-shortLabel queryChain
-longLabel queryChain
+shortLabel $pairQueryDb Alignment
+longLabel  $pairQueryDb Alignment
+group map
 
 track targetChain
 type bigChain $pairRefDb
 bigDataUrl targetChain.bb
-shortLabel targetChain
-longLabel targetChain
+shortLabel $pairRefDb Alignment
+longLabel  $pairRefDb Alignment
+group map
 
 track ncbiRefSeqInsta
 searchIndex name
@@ -81,5 +132,78 @@ baseColorDefault genomicCodons
 priority 1
 quickLiftUrl targetChain.bb
 canPack 1
-_EOF_
+group target
 
+track qdups
+type bigBed 4
+bigDataUrl dups.bb
+shortLabel $pairQueryDb Dups
+longLabel  $pairQueryDb Dups
+group map
+
+track baseQuery
+priority 0.1
+type bigBaseView
+bigDataUrl baseQuery.bb
+shortLabel BaseView
+longLabel $pairQueryDb BaseView
+group query
+
+track baseTarget
+priority 0.1
+type bigBaseView
+bigDataUrl baseTarget.bb
+shortLabel BaseView
+longLabel $pairRefDb BaseView
+group target
+
+track synBlocks
+priority 0.1
+type bigBed 4
+bigDataUrl synBlocks.bb
+shortLabel synBlocks
+longLabel Synteny Blocks
+group map
+
+track mismatch
+type bigBed 4
+bigDataUrl mismatch.bb
+shortLabel Mismatches
+longLabel Mismatches between $pairRefDb and $pairQueryDb
+group map
+
+#track trmsk
+#type bigBed 9
+#itemRgb on
+#shortLabel Rmsk
+#longLabel $pairRefDb Rmsk
+#bigDataUrl $rmskBb
+#quickLiftUrl targetChain.bb
+#group target
+
+track qrmsk
+type bigBed 9
+itemRgb on
+shortLabel Rmsk
+longLabel $pairQueryDb Rmsk
+bigDataUrl $rmskBb
+quickLiftUrl queryChain.bb
+group query
+
+track qsimple
+type bigBed 12
+shortLabel simpleRepeat
+longLabel $pairQueryDb simpleRepeat
+bigDataUrl $simpleBb
+quickLiftUrl queryChain.bb
+group query
+
+track ensGeneQuery
+type bigGenePred
+shortLabel Ensembl
+longLabel Ensembl
+bigDataUrl $ensGeneBb
+quickLiftUrl queryChain.bb
+group query
+
+_EOF_
