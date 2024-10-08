@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import logging, sys, optparse, os, json, subprocess, shutil
-from collections import defaultdict
+import logging, sys, optparse, os, json, subprocess, shutil, string
+from collections import defaultdict, OrderedDict
 from os.path import join, basename, dirname, isfile, relpath, abspath, splitext, isdir
+#import pyyaml   # not loaded here, so it's not a hard requirement, is lazy loaded in parseMetaYaml()
 
 # ==== functions =====
     
@@ -28,9 +29,17 @@ def parseArgs():
     - <url> is the URL to the Jbrowse2 installation, e.g. http://furlonglab.embl.de/FurlongBrowser/
     - <db> is assembly identifier 
 
+    hubtools tab <fname>: convert a hub.txt or trackDb.txt to tab-sep format, easier to bulk-edit with sed/cut/etc.
+    - <fname> is the input filename. "hub" and "genome" stanzas are skipped.
+    - output goes to stdout
+
     Examples:
     hubtools make hg38
     hubtools jbrowse http://furlonglab.embl.de/FurlongBrowser/ dm3
+    hubtools tab hub.txt > tracks.tsv
+
+    tracks.json can look like this:
+    { "hub" : {"hub": "mouse_motor_atac", "shortLabel":"scATAC-seq Developing Cranial Motor Neurons"} }
     """)
 
 
@@ -97,11 +106,12 @@ def parseMetaTsv(fname):
     " parse a tracks.tsv file and return as a dict of trackName -> dict of key->val "
     headers = None
     meta = {}
-    logging.debug("Parsing %s as tab-sep" % fname)
+    logging.debug("Parsing track meta data from %s in tsv format" % fname)
     for line in open(fname):
         row = line.rstrip("\r\n").split("\t")
         if headers is None:
-            assert(line.startswith("track\t"))
+            assert(line.startswith("track\t") or line.startswith("#track"))
+            row[0] = row[0].lstrip("#")
             headers = row
             continue
 
@@ -121,10 +131,19 @@ def parseMetaJson(fname):
     newMeta = json.load(open(fname))
     return newMeta
 
+def parseMetaYaml(fname):
+    " parse yaml file "
+    import yaml # if this doesn't work, run 'pip install pyyaml'
+    with open(fname) as stream:
+        try:
+            return yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            logging.error(exc)
+
 def parseMeta(inDir):
-    " parse a tab-sep file with headers and return a dict firstField -> dictionary "
+    " parse a tab-sep file with headers and return an ordered dict firstField -> dictionary "
     fname = join(inDir, "tracks.tsv")
-    meta = {}
+    meta = OrderedDict()
     if isfile(fname):
         tsvMeta = parseMetaTsv(fname)
         meta = allMetaOverride(meta, tsvMeta)
@@ -139,7 +158,12 @@ def parseMeta(inDir):
         raMeta = parseMetaRa(fname)
         meta = allMetaOverride(meta, raMeta)
 
-    logging.debug("Got overrides from %s: %s" % (inDir, str(meta)))
+    fname = join(inDir, "tracks.yaml")
+    if isfile(fname):
+        yamlMeta = parseMetaYaml(fname)
+        meta = allMetaOverride(meta, yamlMeta)
+
+    logging.debug("Got meta from %s: %s" % (inDir, str(meta)))
     return meta
 
 def writeHubGenome(ofh, db, inMeta):
@@ -158,7 +182,7 @@ def writeHubGenome(ofh, db, inMeta):
     return ofh
 
 def readSubdirs(inDir, subDirs):
-    " given a list of dirs, find those that are composite dirs and those that are supertrack dirs "
+    " given a list of dirs, find those that are composite dirs (not supporting supertracks for now) "
     compDicts, superDicts = {}, {}
     for subDir in subDirs:
         subPath = join(inDir, subDir)
@@ -173,13 +197,35 @@ def readSubdirs(inDir, subDirs):
 
     return compDicts, superDicts
 
-def readDirs(inDir):
+def reorderDirs(compDirs, meta):
+    " order the directories in compDirs in the order that they appear in the meta data -> will mean that composites have the right order "
+    if len(meta)==0:
+        logging.debug("Not reordering these subdirectories: %s" % compDirs.keys())
+        return compDirs
+
+    # first use the names in the meta data, and put in the right order
+    newCompDirs = OrderedDict()
+    for dirName in meta.keys():
+        if dirName in compDirs:
+            newCompDirs[dirName] = compDirs[dirName]
+
+    # then add everything else at the end
+    for dirName in compDirs:
+        if dirName not in newCompDirs:
+            newCompDirs[dirName] = compDirs[dirName]
+
+    logging.debug("Reordered input directories based on meta data. New order is: %s" % newCompDirs.keys())
+    return newCompDirs
+
+
+def readDirs(inDir, meta):
     " recurse down into directories and return containerType -> parentName -> fileBase -> type -> list of absPath "
     ret = {}
     subDirs, topFiles = readFnames(inDir)
     ret["top"] = { None : topFiles } # top-level track files have None as the parent
 
     compDirs, superDirs = readSubdirs(inDir, subDirs)
+    compDirs = reorderDirs(compDirs, meta)
     # superDirs not used yet, no time
 
     ret["comps"] = compDirs
@@ -265,13 +311,21 @@ def writeStanza(ofh, indent, tdb):
 
 def metaOverride(tdb, meta):
     " override track info for one single track, from meta into tdb "
-    if not tdb["track"] in meta:
+    trackName = tdb["track"]
+
+    if trackName not in meta and "__" in trackName:
+        logging.debug("Using only basename of track %s" % trackName)
+        trackName = trackName.split("__")[1]
+
+    if trackName not in meta:
+        logging.debug("No meta info for track %s" % tdb["track"])
         return
 
-    trackMeta = meta[tdb["track"]]
+    trackMeta = meta[trackName]
 
     for key, val in trackMeta.items():
-        tdb[key] = trackMeta[key]
+        if val!="":
+            tdb[key] = trackMeta[key]
 
 def allMetaOverride(tdb, meta):
     " override track info for all tracks, from meta into tdb "
@@ -290,21 +344,65 @@ def allMetaOverride(tdb, meta):
 
     return tdb
 
+def reorderTracks(fileDict, meta):
+    " given an unsorted dictionary of files and ordered metadata, try to sort the files according to the metadata"
+    if len(meta)==0:
+        return fileDict # no meta data -> no ordering necessary
+
+    trackOrder = []
+    # meta is an OrderedDict, so the keys are also ordered
+    for trackName in meta.keys():
+        if "__" in trackName: # in composite mode, the tracknames contain the parent and the track type
+            trackName = trackName.split("__")[1]
+        trackOrder.append( trackName )
+
+    trackOrder = list(meta.keys())
+
+    newFiles = OrderedDict()
+    doneTracks = set()
+    # first add the tracks in the order of the meta data
+    for trackBase in trackOrder:
+        # the tsv file can have the track names either as basenames or as full tracknames
+        if trackBase not in fileDict and "__" in trackBase:
+            trackBase = trackBase.split("__")[1]
+
+        if trackBase in fileDict:
+            newFiles[trackBase] = fileDict[trackBase]
+            doneTracks.add(trackBase)
+
+    logging.debug("Track ordering from meta data used: %s" % newFiles.keys())
+
+    # then add all other tracks
+    for trackBase, fileData in fileDict.items():
+        if trackBase not in doneTracks:
+            newFiles[trackBase] = fileDict[trackBase]
+            logging.debug("Not specified in meta, so adding at the end: %s" % trackBase)
+
+    logging.debug("Final track order is: %s" % newFiles.keys())
+
+    assert(len(newFiles)==len(fileDict))
+    return newFiles
+
 def writeTdb(inDir, dirDict, dirType, tdbDir, ofh):
     " given a dict with basename -> type -> filenames, write track entries to ofh "
+    # this code is getting increasingly complex because it supports composites/views and pairing of bigBed/bigWig files
+    # either this needs better comments or maybe a separate code path for this rare use case
     global compCount
 
     fnameDict = dirDict[dirType]
 
     for parentName, typeDict in fnameDict.items():
-        if parentName is None: # top level tracks
+        if parentName is None: # top level tracks: use top tracks.tsv
             subDir = inDir
-        else: # container tracks
+        else: # container tracks -> use tracks.tsv in the subdirectory
             subDir = join(inDir, parentName)
-        parentMeta = parseMeta(inDir)
+
+        parentMeta = parseMeta(subDir)
 
         indent = 0
         parentHasViews = False
+
+        groupMeta = {}
 
         if dirType=="comps":
             tdb = {
@@ -316,6 +414,7 @@ def writeTdb(inDir, dirDict, dirType, tdbDir, ofh):
                     "type" : "bed 4"
                   }
             metaOverride(tdb, parentMeta)
+            groupMeta = parentMeta
 
             parentHasViews = mostFilesArePaired(typeDict)
 
@@ -327,6 +426,7 @@ def writeTdb(inDir, dirDict, dirType, tdbDir, ofh):
             indent = 4
 
             if parentHasViews:
+                # we have composites with paired files? -> write the track stanzas for the two views
                 groupMeta = parseMeta(subDir)
                 tdbViewPeaks = {
                         "track" : parentName+"ViewPeaks",
@@ -353,7 +453,10 @@ def writeTdb(inDir, dirDict, dirType, tdbDir, ofh):
                 metaOverride(tdbViewSig, parentMeta)
                 writeStanza(ofh, indent, tdbViewSig)
         else:
-                groupMeta = parseMeta(subDir)
+            # no composites
+            groupMeta = parseMeta(subDir)
+
+        typeDict = reorderTracks(typeDict, groupMeta)
 
         for trackBase, typeFnames in typeDict.items():
             for fileType, absFnames in typeFnames.items():
@@ -372,18 +475,18 @@ def writeTdb(inDir, dirDict, dirType, tdbDir, ofh):
                         assert(False) # views and non-bigWig/Bed are not supported yet?
 
                 if parentName is not None:
-                    parentPrefix = parentName+"-"
+                    parentPrefix = parentName+"__"
                 else:
                     parentPrefix = ""
 
-                trackName = parentPrefix+trackBase+"-"+fileType
+                trackName = parentPrefix+trackBase+"__"+fileType
                 tdb = {
-                        "track" : trackName,
-                        "shortLabel": trackBase+labelSuff,
-                        "longLabel": trackBase+labelSuff,
-                        "visibility" : "dense",
-                        "type" : fileType,
-                        "bigDataUrl" : relFname,
+                        "track"      :  trackName,
+                        "shortLabel" :  trackBase+labelSuff,
+                        "longLabel"  :  trackBase+labelSuff,
+                        "visibility" :  "dense",
+                        "type"       :  fileType,
+                        "bigDataUrl" :  relFname,
                       }
 
                 if parentName:
@@ -452,7 +555,6 @@ def importJbrowse(baseUrl, db, outDir):
             tdb["visibility"] = "pack"
     
         writeStanza(ofh, 0, tdb)
-        
 
 def installModule(package):
     " install a package "
@@ -479,6 +581,64 @@ def uploadFiles(tdbDir):
         uploader = my_client.uploader(fpath, metadata=meta)
         uploader.upload()
 
+def iterRaStanzas(fname):
+    " parse an ra-style (trackDb) file and yield dictionaries "
+    data = dict()
+    logging.debug("Parsing %s in trackDb format" % fname)
+    with open(fname, "rt") as ifh:
+        for l in ifh:
+            l = l.lstrip(" ").rstrip("\r\n")
+            if len(l)==0:
+                yield data
+                data = dict()
+            else:
+                if " " not in l:
+                    continue
+                key, val = l.split(" ", maxsplit=1)
+                data[key] = val
+
+    if len(data)!=0:
+        yield data
+
+def raToTab(fname):
+    " convert .ra file to .tsv "
+    stanzas = []
+    allFields = set()
+    for stanza in iterRaStanzas(fname):
+        if "hub" in stanza or "genome" in stanza:
+            continue
+        allFields.update(stanza.keys())
+        stanzas.append(stanza)
+
+    if "track" in allFields:
+        allFields.remove("track")
+    if "shortLabel" in allFields:
+        allFields.remove("shortLabel")
+
+    hasLongLabel = False
+    if "longLabel" in allFields:
+        allFields.remove("longLabel")
+        hasLongLabel = True
+
+    sortedFields = sorted(list(allFields))
+    # make sure that track shortLabel and longLabel come first and always there, handy for manual edits
+    if hasLongLabel:
+        sortedFields.insert(0, "longLabel")
+    sortedFields.insert(0, "shortLabel")
+    sortedFields.insert(0, "track")
+
+    ofh = sys.stdout
+    ofh.write("#")
+    ofh.write("\t".join(sortedFields))
+    ofh.write("\n")
+
+    for s in stanzas:
+        row = []
+        for fieldName in sortedFields:
+            row.append(s.get(fieldName, ""))
+        ofh.write("\t".join(row))
+        ofh.write("\n")
+
 def hubt(args, options):
     """ get writeLn(ofh, indent, d .bb files under dirName and create a trackDb.txt for them"""
 
@@ -498,9 +658,13 @@ def hubt(args, options):
 
     if cmd=="jbrowse":
         importJbrowse(args[1], args[2], tdbDir)
+    elif cmd == "tab":
+        raToTab(args[1])
     elif cmd == "make":
         db = args[1]
-        dirFiles = readDirs(inDir)
+
+        meta = parseMeta(inDir)
+        dirFiles = readDirs(inDir, meta)
 
         hubFname = join(tdbDir, "hub.txt")
         logging.info("Writing %s" % hubFname)
@@ -513,6 +677,8 @@ def hubt(args, options):
         writeTdb(inDir, dirFiles, "comps", tdbDir, ofh)
 
         ofh.close()
+    else:
+        logging.error("Unknown command: '%s'" % args[1])
 
 
 # ----------- main --------------
