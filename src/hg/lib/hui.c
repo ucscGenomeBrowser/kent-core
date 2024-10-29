@@ -5998,7 +5998,7 @@ safef(varName, sizeof(varName), "%s.doWiggle", name);
 cgiMakeCheckBox(varName, option);
 printf("<BR>\n");
 char *style = option ? "display:block" : "display:none";
-printf("<DIV ID=\"densGraphOptions\" STYLE=\"%s\">\n", style);
+printf("<DIV id=\"densGraphOptions%s\" STYLE=\"%s\">\n", name, style);
 
 // we need to fool the wiggle dialog into defaulting to autoscale and maximum
 char *origType = tdb->type;
@@ -6010,8 +6010,8 @@ if (hashFindVal(tdb->settingsHash, WINDOWINGFUNCTION) == NULL)
 wigCfgUi(cart,tdb,name,title,TRUE);
 tdb->type = origType;
 printf("</DIV>\n\n");
-jsInlineF("$(\"input[name='%s']\").click( function() { $('#densGraphOptions').toggle();} );\n"
-    , varName); // XSS FILTER?
+jsInlineF("$(\"input[name='%s']\").click( function() { $('#densGraphOptions%s').toggle();} );\n"
+    , varName, name); // XSS FILTER?
 }
 
 void filterNameOption(struct cart *cart, char *name, struct trackDb *tdb)
@@ -6036,8 +6036,9 @@ safef(varName, sizeof(varName), "%s.colorOverride", name);
 
 char *colorValue = cartUsualString(cart, varName, "");
 
-puts("&nbsp;<div id='colorPicker'>");
-jsInlineF("makeHighlightPicker('%s', document.getElementById('colorPicker'), '%s', 'Change track color:', '%s');", varName, name, colorValue); // id="xx" is necessary as id contains a dot
+printf("&nbsp;<div id='colorPicker_%s'>", name);
+jsInlineF("makeHighlightPicker('%s', document.getElementById('colorPicker_%s'), '%s', 'Change track color:', '%s');",
+        varName, name, name, colorValue); // id="xx" is necessary as id contains a dot
 puts("</div>\n\n");
 }
 
@@ -9483,16 +9484,22 @@ return TRUE;
 
 static bool mouseOverJsDone = FALSE;
 
-void printInfoIcon(char *mouseover)
-/* Print info icon (i) with explanatory text on mouseover */
+void printInfoIconSvg()
+/* Print just info icon (i) as svg tag to stdout */
 {
-// see https://www.svgrepo.com/svg/524660/info-circle
-printf("<span title=\"%s\">", mouseover);
 puts("<svg style='height:1.1em; vertical-align:top' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>");
 puts("<circle cx='12' cy='12' r='10' stroke='#1C274C' stroke-width='1.5'/>");
 puts("<path d='M12 17V11' stroke='#1C274C' stroke-width='1.5' stroke-linecap='round'/>");
 puts("<circle cx='1' cy='1' r='1' transform='matrix(1 0 0 -1 11 9)' fill='#1C274C'/>");
 puts("</svg>");
+}
+
+void printInfoIcon(char *mouseover)
+/* Print info icon (i) with explanatory text on mouseover */
+{
+// see https://www.svgrepo.com/svg/524660/info-circle
+printf("<span title=\"%s\">", mouseover);
+printInfoIconSvg();
 puts("</span>");
 if (!mouseOverJsDone)
     {
@@ -10351,7 +10358,7 @@ outs[4] = endString;
 ins[5] = "$s";
 outs[5] = skipChr(seqName);
 ins[6] = "$D";
-outs[6] = db;
+outs[6] = trackHubSkipHubName(db);
 ins[7] = "$P";  /* for an item name of the form:  prefix:suffix */
 ins[8] = "$p";	/* the P is the prefix, the p is the suffix */
 if (stringIn(":", idInUrl)) {

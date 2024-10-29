@@ -235,11 +235,27 @@ _EOF_
   ;
   close($fh);
 
+  my $tmpDir = &HgAutomate::tmpDir();
   # Cluster job script:
   $fh = &HgAutomate::mustOpen(">$runDir/RMRun.csh");
   print $fh <<_EOF_
 #!/bin/csh -ef
 
+if ( -d "/data/tmp" ) then
+  setenv TMPDIR "/data/tmp"
+else if ( -d "/scratch/tmp" ) then
+  setenv TMPDIR "/scratch/tmp"
+else
+  set tmpSz = `df --output=avail -k /tmp | tail -1`
+  set shmSz = `df --output=avail -k /dev/shm | tail -1`
+  if ( "\${shmSz}" > "\${tmpSz}" ) then
+     mkdir -p /dev/shm/tmp
+     chmod 777 /dev/shm/tmp
+     setenv TMPDIR "/dev/shm/tmp"
+  else
+     setenv TMPDIR "/tmp"
+  endif
+endif
 set path = (/cluster/software/bin \$path)
 
 set finalOut = \$1
@@ -251,7 +267,7 @@ set catOut = \$finalOut:r.cat
 
 # Use local disk for output, and move the final result to \$outPsl
 # when done, to minimize I/O.
-set tmpDir = `mktemp -d -p /scratch/tmp doRepeatMasker.cluster.XXXXXX`
+set tmpDir = `mktemp -d -p \$TMPDIR doRepeatMasker.cluster.XXXXXX`
 pushd \$tmpDir
 
 # Initialize local library
