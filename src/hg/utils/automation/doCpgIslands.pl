@@ -177,15 +177,7 @@ if [ -d "/data/tmp" ]; then
 elif [ -d "/scratch/tmp" ]; then
   export TMPDIR="/scratch/tmp"
 else
-  tmpSz=`df --output=avail -k /tmp | tail -1`
-  shmSz=`df --output=avail -k /dev/shm | tail -1`
-  if [ "\${shmSz}" -gt "\${tmpSz}" ]; then
-     mkdir -p /dev/shm/tmp
-     chmod 777 /dev/shm/tmp
-     export TMPDIR="/dev/shm/tmp"
-  else
-     export TMPDIR="/tmp"
-  fi
+  export TMPDIR="/tmp"
 fi
 
 export tmpFile=`mktemp -p \$TMPDIR doCpg.\$\$.XXXXX`
@@ -234,7 +226,7 @@ do
 done
 mkdir -p results
 chmod a+x runCpg.bash oneSplit.bash
-grep -v "parts/part" part.list | xargs -L 1 --no-run-if-empty ./oneSplit.bash
+(grep -v "parts/part" part.list || true) | xargs -L 1 --no-run-if-empty ./oneSplit.bash
 rm -f file.list
 find ./partFa -type f > file.list
 $gensub2 file.list single gsub jobList
