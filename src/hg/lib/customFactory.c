@@ -465,7 +465,7 @@ if (dbRequested)
 return track;
 }
 
-static struct bed *customTrackBed(char *row[64], int wordCount, int chromSize, struct lineFile *lf)
+static struct bed *customTrackBed(char **row, int wordCount, int chromSize, struct lineFile *lf)
 /* Convert a row of strings to a bed.
  * Intended to replace old customTrackBed,
  * currently new code is activated by hg.conf switch */
@@ -479,7 +479,7 @@ if (bed->chromEnd > chromSize)
 return bed;
 }
 
-static struct bed *customTrackBedOld(char *db, char *row[13], int wordCount,
+static struct bed *customTrackBedOld(char *db, char **row, int wordCount,
 	struct hash *chromHash, struct lineFile *lf, char *aliasName)
 /* Convert a row of strings to a bed. */
 {
@@ -4065,14 +4065,10 @@ struct paraFetchData
 static pthread_mutex_t pfdMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct paraFetchData *pfdList = NULL, *pfdRunning = NULL, *pfdDone = NULL, *pfdNeverStarted = NULL;
 
-static void *remoteParallelLoad(void *threadParam)
+static void *remoteParallelLoad(void *x)
 /* Each thread loads tracks in parallel until all work is done. */
 {
-pthread_t *pthread = threadParam;
 struct paraFetchData *pfd = NULL;
-pthread_detach(*pthread);  // this thread will never join back with it's progenitor
-    // Canceled threads that might leave locks behind,
-    // so the theads are detached and will be neither joined nor canceled.
 boolean allDone = FALSE;
 while(1)
     {
@@ -4239,6 +4235,7 @@ while ((line = customPpNextReal(cpp)) != NULL)
      * First time through make up track var from thin air
      * if no track line. Find out explicit type setting if any.
      * Also make sure settingsHash is set up. */
+    // NOTE: line is binary data if a file upload
     lf = cpp->fileStack;
     char *dataUrl = NULL;
     if (lf->fileName && (
@@ -4429,11 +4426,14 @@ if (doParallelLoad && (ptMax > 0))     // parallelFetch.threads=0 to disable par
 	int pt;
 	for (pt = 0; pt < ptMax; ++pt)
 	    {
-	    int rc = pthread_create(&threads[pt], NULL, remoteParallelLoad, &threads[pt]);
+	    int rc = pthread_create(&threads[pt], NULL, remoteParallelLoad, NULL);
 	    if (rc)
 		{
 		errAbort("Unexpected error %d from pthread_create(): %s",rc,strerror(rc));
 		}
+	    pthread_detach(threads[pt]);  // this thread will never join back with it's progenitor
+		    // Canceled threads that might leave locks behind,
+		    // so the threads are detached and will be neither joined nor canceled.
 	    }
 	}
     }
