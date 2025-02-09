@@ -3,6 +3,13 @@ CC?=gcc
 # allow the somewhat more modern C syntax, e.g. 'for (int i=5; i<10, i++)'
 CFLAGS += -std=c99
 
+# This is required to get the cgiLoader.mk compile target to work.  for some
+# reason, make's %.o: %.c overrides the rule below, cause the compiles to fail
+# due to lack of -I flags in rule.  Running with make -r to not use built-in
+# rules fixes, however MAKEFLAGS += -r doesn't do the trick, this does.
+# make is a very mysterious fellow traveler.
+GNUMAKEFLAGS += -r
+
 # add additional library paths
 L += ${LDFLAGS}
 
@@ -25,14 +32,29 @@ HG_INC+=-I../inc -I../../inc -I../../../inc -I../../../../inc -I../../../../../i
 
 # to check for Mac OSX Darwin specifics:
 UNAME_S := $(shell uname -s)
+# to check for differences in Linux OS version
+KERNEL_REL := $(shell uname -r)
 # to check for builds on hgwdev
 HOSTNAME = $(shell uname -n)
 
-ifeq (${HOSTNAME},hgwdev-new)
+# Semi-static builds, normally done in Docker
+#
+# use make SEMI_STATIC=yes to enable
+#  
+# These use static libraries except for -ldl, -lm, and -lc
+# which must be dynamic.
+#
+ifeq (${SEMI_STATIC},yes)
+    # switch to static libraries
+    STATIC_PRE = -Wl,-Bstatic
+endif
+L = ${STATIC_PRE}
+
+ifeq (${HOSTNAME},hgwdev)
   IS_HGWDEV = yes
   OURSTUFF = /cluster/software/r9
 else
-  ifeq (${HOSTNAME},hgwdev)
+  ifeq (${HOSTNAME},hgwdev-old.gi.ucsc.edu)
     IS_HGWDEV = yes
     OURSTUFF = /cluster/software
   else
@@ -156,6 +178,10 @@ endif
 
 ifneq ($(UNAME_S),Darwin)
   L+=${PTHREADLIB}
+  ifneq ($(filter 3.%, ${KERNEL_REL}),)
+     # older linux needed libconv
+    XXXICONVLIB=-liconv
+  endif
 else
   ifeq (${ICONVLIB},)
     ICONVLIB=-liconv
@@ -182,10 +208,10 @@ ifeq (${USE_HAL},1)
     HDF5LIBDIR=${HDF5DIR}/local/lib
     HDF5LIBS=${HDF5LIBDIR}/libhdf5_cpp.a ${HDF5LIBDIR}/libhdf5.a ${HDF5LIBDIR}/libhdf5_hl.a
     HALLIBS=${HALDIR}/hal/lib/libHalBlockViz.a ${HALDIR}/hal/lib/libHalMaf.a ${HALDIR}/hal/lib/libHalLiftover.a ${HALDIR}/hal/lib/libHalLod.a ${HALDIR}/hal/lib/libHal.a ${HALDIR}/sonLib/lib/sonLib.a ${HDF5LIBS} ${ZLIB}
-    ifeq (${HOSTNAME},hgwdev-new)
+    ifeq (${HOSTNAME},hgwdev)
         HALLIBS += ${OURSTUFF}/lib/libcurl.a /usr/lib/gcc/x86_64-redhat-linux/11/libstdc++.a
     else
-      ifeq (${HOSTNAME},hgwdev)
+      ifeq (${HOSTNAME},hgwdev-old.gi.ucsc.edu)
           HALLIBS += ${OURSTUFF}/lib/libcurl.a /usr/lib/gcc/x86_64-redhat-linux/4.8.5/libstdc++.a
       else
           HALLIBS += -lcurl -lstdc++
@@ -205,11 +231,6 @@ endif
 
 ifeq (${USE_HIC},1)
     HG_DEFS+=-DUSE_HIC
-endif
-
-# autodetect where libm is installed
-ifeq (${MLIB},)
-  MLIB=-lm
 endif
 
 # autodetect where png is installed
@@ -247,7 +268,9 @@ ifneq ($(MAKECMDGOALS),clean)
   # this does *not* work on Mac OSX with the dynamic libraries
   ifneq ($(UNAME_S),Darwin)
     ifeq (${MYSQLLIBS},)
-      MYSQLLIBS := $(shell mysql_config --libs || true)
+      # mysql_config --libs includes -lm, however libm must be a dynamic library
+      # so to handle SEMI_STATIC it is removed here and will be added at the end
+      MYSQLLIBS := $(shell mysql_config --libs | sed 's/-lm$$//' || true)
 #        $(info using mysql_config to set MYSQLLIBS: ${MYSQLLIBS})
     endif
   endif
@@ -294,9 +317,9 @@ ifeq (${IS_HGWDEV},yes)
    HG_INC += -I${OURSTUFF}/include/mariadb 
    FULLWARN = yes
    L+=/hive/groups/browser/freetype/freetype-2.10.0/objs/.libs/libfreetype.a
-   L+=${OURSTUFF}/lib64/libssl.a ${OURSTUFF}/lib64/libcrypto.a -ldl
+   L+=${OURSTUFF}/lib64/libssl.a ${OURSTUFF}/lib64/libcrypto.a
 
-   ifeq (${HOSTNAME},hgwdev-new)
+   ifeq (${HOSTNAME},hgwdev)
        PNGLIB=${OURSTUFF}/lib/libpng.a
        PNGINCL=-I${OURSTUFF}/include/libpng16
    else
@@ -305,9 +328,9 @@ ifeq (${IS_HGWDEV},yes)
    endif
 
    MYSQLINC=/usr/include/mysql
-   MYSQLLIBS=${OURSTUFF}/lib64/libmariadbclient.a ${OURSTUFF}/lib64/libssl.a ${OURSTUFF}/lib64/libcrypto.a -ldl ${ZLIB}
+   MYSQLLIBS=${OURSTUFF}/lib64/libmariadbclient.a ${OURSTUFF}/lib64/libssl.a ${OURSTUFF}/lib64/libcrypto.a ${ZLIB}
 
-   ifeq (${HOSTNAME},hgwdev-new)
+   ifeq (${HOSTNAME},hgwdev)
        MYSQLLIBS += /usr/lib/gcc/x86_64-redhat-linux/11/libstdc++.a /usr/lib64/librt.a
    else
        MYSQLLIBS += /usr/lib/gcc/x86_64-redhat-linux/4.8.5/libstdc++.a /usr/lib64/librt.a
@@ -315,7 +338,7 @@ ifeq (${IS_HGWDEV},yes)
 
 else
    ifeq (${CONDA_BUILD},1)
-       L+=${PREFIX}/lib/libssl.a ${PREFIX}/lib/libcrypto.a -ldl
+       L+=${PREFIX}/lib/libssl.a ${PREFIX}/lib/libcrypto.a
    else
        ifneq (${SSLLIB},)
           L+=${SSLLIB}
@@ -325,19 +348,26 @@ else
        ifneq (${CRYPTOLIB},)
           L+=${CRYPTOLIB}
        else
-          L+=-lcrypto -ldl
-       endif
-       ifeq (${DLLIB},)
-          L+=-ldl
+          L+=-lcrypto
        endif
    endif
 endif
 
 #global external libraries
 L += $(kentSrc)/htslib/libhts.a
-
 L+=${PNGLIB} ${MLIB} ${ZLIB} ${BZ2LIB} ${ICONVLIB}
 HG_INC+=${PNGINCL}
+
+# NOTE: these must be last libraries and must be dynamic.
+# We switched by to dynamic with SEMI_STATIC
+ifeq (${SEMI_STATIC},yes)
+    # switch back to dynamic libraries
+    DYNAMIC_PRE = -Wl,-Bdynamic
+endif
+DYNAMIC_LIBS =  ${DYNAMIC_PRE} -ldl -lm -lc
+
+L+= ${DYNAMIC_LIBS}
+
 
 # pass through COREDUMP
 ifneq (${COREDUMP},)
@@ -459,10 +489,9 @@ PIPELINE_PATH=/hive/groups/encode/dcc/pipeline
 CONFIG_DIR = ${PIPELINE_PATH}/${PIPELINE_DIR}/config
 ENCODEDCC_DIR = ${PIPELINE_PATH}/downloads/encodeDCC
 
-
 CC_PROG_OPTS = ${COPT} ${CFLAGS} ${HG_DEFS} ${LOWELAB_DEFS} ${HG_WARN} ${HG_INC} ${XINC}
 %.o: %.c
-	${CC} ${CC_PROG_OPTS}  -o $@ -c $<
+	${CC} ${CC_PROG_OPTS} -o $@ -c $<
 
 # autodetect UCSC installation of node.js:
 ifeq (${NODEBIN},)
