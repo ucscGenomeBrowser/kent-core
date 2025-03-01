@@ -58,7 +58,7 @@ ln -s ../trackData/assemblyGap/${asmId}.assembly.bb $buildDir/bbi/${asmId}.assem
 printf "track assembly
 longLabel Assembly
 shortLabel Assembly
-visibility pack
+visibility hide
 colorByStrand 150,100,30 230,170,40
 color 150,100,30
 altColor 230,170,40
@@ -78,7 +78,7 @@ ln -s ../trackData/assemblyGap/${asmId}.gap.bb $buildDir/bbi/${asmId}.gap.bb
 printf "track gap
 longLabel AGP gap
 shortLabel Gap (AGP defined)
-visibility dense
+visibility hide
 color 0,0,0
 bigDataUrl bbi/%s.gap.bb
 type bigBed 4
@@ -120,7 +120,7 @@ printf "track gc5Base
 shortLabel GC Percent
 longLabel GC Percent in 5-Base Windows
 group map
-visibility full
+visibility dense
 autoScale Off
 maxHeightPixels 128:36:16
 graphTypeDefault Bar
@@ -437,7 +437,7 @@ printf "track repeatModeler
 shortLabel RepeatModeler
 longLabel RepeatModeler Repetitive Elements
 type bigRmsk 9 +
-visibility pack
+visibility hide
 group varRep
 bigDataUrl bbi/%s.rModel.bb\n" "${asmId}"
 if [ -s "$buildDir/bbi/${asmId}.rModel.align.bb" ]; then
@@ -675,6 +675,7 @@ export haveNcbiGene="no"
 ## setup ncbiGene only if ncbiRefSeq is not present
 if [ "${haveNcbiRefSeq}" = "no" ]; then
 
+
 # may or may not have a searchTrix for ncbiGene, assume none
 searchTrix=""
 # check to see if there is a index for ncbiGene
@@ -688,11 +689,16 @@ if [ -s ${buildDir}/trackData/ncbiGene/$asmId.ncbiGene.bb ]; then
 rm -f $buildDir/bbi/${asmId}.ncbiGene.bb
 rm -f $buildDir/ixIxx/${asmId}.ncbiGene.ix
 rm -f $buildDir/ixIxx/${asmId}.ncbiGene.ixx
+rm -f ${buildDir}/genes/${asmId}.ncbiGene.gtf.gz
 export longLabel="Gene models submitted to NCBI"
 export shortLabel="Gene models"
 if [ "$asmType" = "refseq" ]; then
   longLabel="NCBI gene predictions"
   shortLabel="NCBI Genes"
+fi
+if [ -s ${buildDir}/trackData/ncbiGene/${asmId}.ncbiGene.gtf.gz ]; then
+  mkdir -p $buildDir/genes
+  ln -s ../trackData/ncbiGene/${asmId}.ncbiGene.gtf.gz $buildDir/genes/${asmId}.ncbiGene.gtf.gz
 fi
 ln -s ../trackData/ncbiGene/$asmId.ncbiGene.bb $buildDir/bbi/${asmId}.ncbiGene.bb
 ln -s ../trackData/ncbiGene/$asmId.ncbiGene.ix $buildDir/ixIxx/${asmId}.ncbiGene.ix
@@ -736,7 +742,7 @@ compositeTrack on
 shortLabel CpG Islands
 longLabel CpG Islands (Islands < 300 Bases are Light Green)
 group regulation
-visibility pack
+visibility dense
 type bigBed 4 +
 html html/%s.cpgIslands\n\n" "${asmId}"
 fi
@@ -794,7 +800,7 @@ printf "track allGaps
 shortLabel All Gaps
 longLabel All gaps of unknown nucleotides (N's), including AGP annotated gaps
 group map
-visibility dense
+visibility hide
 type bigBed 3
 bigDataUrl bbi/%s.allGaps.bb
 html html/%s.allGaps\n\n" "${asmId}" "${asmId}"

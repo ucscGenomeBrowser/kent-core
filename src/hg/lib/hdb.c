@@ -875,7 +875,7 @@ boolean hCanHaveSplitTables(char *db)
 /* Return TRUE if split tables are allowed in database. */
 {
 struct sqlConnection *conn = hAllocConn(db);
-int count = sqlTableSizeIfExists(conn, "chromInfo");
+long count = sqlTableSizeIfExists(conn, "chromInfo");
 hFreeConn(&conn);
 return (count >= 0 && count <= HDB_MAX_SEQS_FOR_SPLIT);
 }
@@ -5547,7 +5547,7 @@ int getTableSize(char *db, char *table)
 /* Get count of rows in a table in the primary database */
 {
 struct sqlConnection *conn = hAllocConn(db);
-int ct = sqlTableSize(conn, table);
+long ct = sqlTableSize(conn, table);
 hFreeConn(&conn);
 return ct;
 }
@@ -5995,4 +5995,22 @@ if (knownDb == NULL)
 checkedDb = cloneString(db);
 
 return knownDb;
+}
+
+boolean isCuratedHubUrl(char *hubUrl)
+/* check if the given hubUrl is pointing to a curated hub */
+{
+boolean isCurated = TRUE;
+
+if (isEmpty(hubUrl))
+    return isCurated;	// this is not a hub, it is a database assembly
+
+isCurated = FALSE;	// only 1 hub is curated: /gbdb/hs1
+if (startsWith("/gbdb", hubUrl))	// might be /gbdb/hs1
+    {
+    if (! startsWith("/gbdb/genark", hubUrl))	// genark hubs == not curated
+        isCurated = TRUE;
+    }
+
+return isCurated;
 }
