@@ -1608,7 +1608,11 @@ struct dyString *dy;
 // add a note that the name based handler shouldn't be used on this track
 // add a note that this is a quickLifted track so the browser will accept tracks that aren't big*
 dy = dyStringNew(200);
-dyStringPrintf(dy, "track %s\nquickLifted on\navoidHandler on\n", trackHubSkipHubName(tdb->track));
+char *track =  trackHubSkipHubName(tdb->track);
+dyStringPrintf(dy, "track %s\nquickLifted on\n", track);
+
+if (!(sameString(track, "decipherSnvs")))
+    dyStringPrintf(dy, "avoidHandler on\n");
     
 dumpTdbAndChildren(dy, tdb);
 
@@ -1616,11 +1620,15 @@ return dy;
 }
 
 static boolean validateOneTdb(char *db, struct trackDb *tdb)
+/* Make sure the tdb is a track type we grok. */
 {
 if (!( startsWith("bigBed", tdb->type) || \
        startsWith("bigWig", tdb->type) || \
+       startsWith("bigDbSnp", tdb->type) || \
+       startsWith("bigGenePred", tdb->type) || \
        startsWith("bed ", tdb->type)))
     {
+    //printf("%s not included: bad type %s\n",tdb->track,tdb->type);
     return FALSE;
     }
 
@@ -1779,4 +1787,46 @@ struct grp *trackHubGetGrps()
 /* Get the groups defined by attached track hubs. */
 {
 return trackHubGrps;
+}
+
+struct trackDb *trackHubAddTracksGenome(struct trackHubGenome *hubGenome)
+/* Load up stuff from data hub and return list. */
+{
+/* Load trackDb.ra file and make it into proper trackDb tree */
+struct trackDb *tdbList = NULL;
+
+if (hubGenome != NULL)
+    {
+    boolean doCache = trackDbCacheOn();
+
+    if (doCache)
+        {
+        // we have to open the trackDb file to get the udc cache to check for an update
+        struct udcFile *checkCache = udcFileMayOpen(hubGenome->trackDbFile, NULL);
+        if (checkCache != NULL)
+            {
+            time_t time = udcUpdateTime(checkCache);
+            udcFileClose(&checkCache);
+
+            struct trackDb *cacheTdb = trackDbHubCache(hubGenome->trackDbFile, time);
+
+            if (cacheTdb != NULL)
+                return cacheTdb;
+            }
+
+        memCheckPoint(); // we want to know how much memory is used to build the tdbList
+        }
+
+    struct dyString *incFiles = newDyString(4096);
+    boolean foundFirstGenome = FALSE;
+    tdbList = trackHubTracksForGenome(hubGenome->trackHub, hubGenome, incFiles, &foundFirstGenome);
+    tdbList = trackDbLinkUpGenerations(tdbList);
+    tdbList = trackDbPolishAfterLinkup(tdbList, hubGenome->name);
+    trackDbPrioritizeContainerItems(tdbList);
+    trackHubPolishTrackNames(hubGenome->trackHub, tdbList);
+
+    if (doCache)
+        trackDbHubCloneTdbListToSharedMem(hubGenome->trackDbFile, tdbList, memCheckPoint(), incFiles->string);
+    }
+return tdbList;
 }
