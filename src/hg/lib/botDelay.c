@@ -107,10 +107,27 @@ char *getBotCheckString(char *ip, double fraction)
 {
 char *user = getCookieUser();
 char *botCheckString = needMem(256);
-if (user)
-  safef(botCheckString, 256, "%s.%s %f", user, ip, fraction);
+boolean useNew = cfgOptionBooleanDefault("newBotDelay", FALSE);
+if (useNew)
+    {
+        char *hgsid = cgiOptionalString("hgsid");
+        if (user)
+            safef(botCheckString, 256, "uid%s %f", user, fraction);
+        else
+            {
+            if (hgsid)
+                safef(botCheckString, 256, "sid%s %f", hgsid, fraction);
+            else
+                safef(botCheckString, 256, "%s %f", ip, fraction);
+            }
+    }
 else
-  safef(botCheckString, 256, "%s %f", ip, fraction);
+    {
+    if (user)
+      safef(botCheckString, 256, "%s.%s %f", user, ip, fraction);
+    else
+      safef(botCheckString, 256, "%s %f", ip, fraction);
+    }
 return botCheckString;
 }
 
@@ -244,6 +261,8 @@ else
            "you think this delay is being imposed unfairly, please contact genome-www@soe.ucsc.edu."
            ,hogHost, asctime(localtime(&now)), botDelayMillis);
     puts("</body></html>");
+    if (cfgOptionBooleanDefault("sleepOn429", TRUE))
+        sleep(10);
     }
 cgiExitTime(cgiExitName, enteredMainTime);
 exit(0);
