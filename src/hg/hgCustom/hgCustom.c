@@ -116,6 +116,7 @@ puts(" Data must be formatted in\n"
 " <A TARGET=_BLANK HREF='../goldenPath/help/bigWig.html'>bigWig</A>,\n"
 " <A TARGET=_BLANK HREF='../goldenPath/help/bam.html'>BAM</A>,\n"
 " <A TARGET=_BLANK HREF='../goldenPath/help/barChart.html'>barChart</A>,\n"
+" <A TARGET=_BLANK HREF='../goldenPath/help/bigMethyl.html'>barChart</A>,\n"
 " <A TARGET=_BLANK HREF='../goldenPath/help/vcf.html'>VCF</A>,\n"
 " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1'>BED</A>,\n"
 " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1.7'>BED detail</A>,\n"
@@ -481,7 +482,7 @@ else
     printf("<FORM STYLE=\"margin-bottom:0;\" ACTION=\"%s\" METHOD=\"GET\" NAME=\"orgForm\">", hgCustomName());
     cartSaveSession(cart);
     if (gotClade)
-        printf("<INPUT TYPE=\"HIDDEN\" NAME=\"Clade\" VALUE=\"\">\n");
+        printf("<INPUT TYPE=\"HIDDEN\" NAME=\"clade\" VALUE=\"\">\n");
     printf("<INPUT TYPE=\"HIDDEN\" NAME=\"org\" VALUE=\"%s\">\n", organism);
     printf("<INPUT TYPE=\"HIDDEN\" NAME=\"db\" VALUE=\"%s\">\n", database);
     printf("<INPUT TYPE=\"HIDDEN\" NAME=\"hgct_do_add\" VALUE=\"1\">\n");

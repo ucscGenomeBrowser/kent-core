@@ -373,10 +373,10 @@ command is one of:
                bedSort, ... to /usr/local/bin
                This has to be run after the browser has been installed, other-
                wise these packages may be missing: libpng zlib mariadb-client
-  dev        - install git/gcc/c++/freetype/etc, clone the kent repo into
+  dev        - setup git/gcc/c++/freetype/etc, clone the kent repo into
                ~/kent and build the CGIs into /usr/local/apache so you can try
                them right away. Useful if you want to develop your own track 
-               type. (OSX OK)
+               type. Usually, this is run after 'browserSetup.sh install' (OSX OK)
   mysql      - Patch my.cnf and recreate Mysql users. This can fix
                a broken Mysql server after an update to Mysql 8. 
                
@@ -1053,30 +1053,8 @@ function installDebian ()
     # imagemagick for the session gallery
     # r-base-core for the gtex tracks
     # python-mysqldb for hgGeneGraph
+    # libcurl for the new captcha
     apt-get $APTERR --no-install-recommends --assume-yes install ghostscript imagemagick wget rsync r-base-core curl gsfonts curl
-    # python-mysqldb has been removed in almost all distros as of 2021
-    # There is no need to install Python2 anymore. Remove the following?
-    if apt-cache policy python-mysqldb | grep "Candidate: .none." > /dev/null; then 
-	    echo2 The package python-mysqldb is not available anymore. Working around it
-	    echo2 by installing python2 and MySQL-python with pip2
-	    if apt-cache policy python2 | grep "Candidate: .none." > /dev/null; then 
-               # Ubuntu >= 21 does not have python2 anymore - hgGeneGraph has been ported, so not an issue anymore
-   	       echo2 Python2 package is not available either for this distro, so not installing Python2 at all.
-	    else
-               # workaround for Ubuntu 16-20 - keeping this section for a few years, just in case
-               apt-get install $APTERR --assume-yes python2 libmariadb-dev python2-dev wget gcc
-    	       curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py
-    	       python2 /tmp/get-pip.py
-               if [ -f /usr/include/mysql/my_config.h ]; then
-                   echo my_config.h found
-               else
-                   wget https://raw.githubusercontent.com/paulfitz/mysql-connector-c/master/include/my_config.h -P /usr/include/mysql/
-               fi
-               pip2 install MySQL-python
-	    fi
-    else
-	    apt-get --assume-yes install python-mysqldb
-    fi
 
     if [ ! -f $APACHECONF ]; then
         echo2
@@ -1442,6 +1420,16 @@ function setupBuildOsx ()
    else
        brew update
    fi
+
+   if brew list --formula | grep -q "^mysql\$"; then
+       echo "MySQL is already installed via Homebrew. We need mariadb for the browser, but it is not easy to install mariadb ";
+       echo "when MySQL is already installed. Consider running 'brew uninstall mariadb' and then an rm command like this:"
+       echo "rm -rf /opt/homebrew/var/mysql /opt/homebrew/etc/my.cnf /opt/homebrew/etc/my.cnf.d /opt/homebrew/etc/my.cnf.default"
+       echo "Then run 'brew install mariadb' and see if you can connect using the mariadb command."
+       echo "Then restart this program."
+       exit 150
+   fi
+
    echo2 Installing homebrew packages libpng, openssl, mariadb, git
    brew install libpng openssl mariadb git freetype
 
@@ -1499,9 +1487,9 @@ function setupBuildLinux ()
    waitKey
    if [[ "$DIST" == "debian" ]]; then
       debianInitApt
-      apt-get --assume-yes $APTERR install make git gcc g++ libpng-dev libmariadb-dev uuid-dev libfreetype-dev libbz2-dev pkg-config
+      apt-get --assume-yes $APTERR install make git gcc g++ libpng-dev libmariadb-dev uuid-dev libfreetype-dev libbz2-dev pkg-config libcurl4-openssl-dev
    elif [[ "$DIST" == "redhat" ]]; then
-      yum install -y git vim gcc gcc-c++ make libpng-devel libuuid-devel freetype-devel
+      yum install -y git vim gcc gcc-c++ make libpng-devel libuuid-devel freetype-devel libcurl-devel
    else 
       echo Error: Cannot identify linux distribution
       exit 100

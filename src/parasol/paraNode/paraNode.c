@@ -32,6 +32,7 @@ static struct optionSpec optionSpecs[] = {
     {"randomDelay", OPTION_INT},
     {"cpu", OPTION_INT},
     {"localhost", OPTION_STRING},
+    {"node", OPTION_STRING},
     {NULL, 0}
 };
 
@@ -60,6 +61,7 @@ errAbort("paraNode - version %s\n"
 	 "        file opens when loading up an idle cluster.  Also it limits\n"
 	 "        the impact on the hub of very short jobs. Default 5000.\n"
 	 "    -cpu=N  Number of CPUs to use - default 1.\n"
+	 "    -node=host  name used to identify this machine including resurrect and checkjob.\n"
 	, version
 	);
 }
@@ -574,26 +576,6 @@ if (jobIdString != NULL)
     }
 }
 
-void doResurrectFullCheck(struct paraMessage pm, char *ipStr, struct job *job, boolean *firstTime, int *jobsReported)
-/* Print a job, if overflows packet, send it and start another. */
-{
-if (firstTime)
-  {
-  pmInit(&pm, ipStr, paraHubPortStr);
-  pmPrintf(&pm, "alive %s", hostName);
-  *firstTime = FALSE;
-  }
-pmPrintf(&pm, " %d", job->jobId);
-++jobsReported;
-
-if ((rudpMaxSize - pm.size) < 20)
-    {
-    pmSend(&pm, mainRudp);
-    *firstTime = TRUE;
-    *jobsReported = 0;
-    }
-}
-
 void doResurrect(char *line, struct sockaddr_storage *ipAddress)
 /* Send back I'm alive message */
 {
@@ -602,22 +584,32 @@ struct dlNode *node;
 int jobsReported = 0;
 char     ipStr[NI_MAXHOST];
 getAddrAsString6n4(ipAddress, ipStr, sizeof ipStr);
-boolean firstTime = TRUE;
-struct job *job = NULL;
+pmInit(&pm, ipStr, paraHubPortStr);
+
 for (node = jobsRunning->head; !dlEnd(node); node = node->next)
     {
-    job = node->val;
-    doResurrectFullCheck(pm, ipStr, job, &firstTime, &jobsReported);
+    struct job *job = node->val;
+    pmClear(&pm);
+    pmPrintf(&pm, "alive %s %d", hostName, job->jobId);
+    if (!pmSend(&pm, mainRudp))
+        return;
+    ++jobsReported;
     }
 for (node = jobsFinished->head; !dlEnd(node); node = node->next)
     {
-    job = node->val;
-    doResurrectFullCheck(pm, ipStr, job, &firstTime, &jobsReported);
+    struct job *job = node->val;
     if (jobsReported >= maxProcs)
 	break;
+    pmClear(&pm);
+    pmPrintf(&pm, "alive %s %d", hostName, job->jobId);
+    if (!pmSend(&pm, mainRudp))
+        return;
+    ++jobsReported;
     }
-if (jobsReported)
-    pmSend(&pm, mainRudp);
+pmClear(&pm);
+pmPrintf(&pm, "alive %s done", hostName);
+if (!pmSend(&pm, mainRudp))
+    return;
 }
 
 void doRun(char *line, struct sockaddr_storage *ipAddress)
@@ -824,7 +816,6 @@ char *command;
 struct sockaddr_storage sai;
 
 /* We have to know who we are... */
-hostName = getMachine();
 initRandom();
 getTicksToHundreths();
 
@@ -915,6 +906,7 @@ userPath = optionVal("userPath", userPath);
 sysPath = optionVal("sysPath", sysPath);
 envExtra = optionMultiVal("env", NULL);
 randomDelay = optionInt("randomDelay", randomDelay);
+hostName = optionVal("node", getMachine());
 
 /* Look up IP addresses. */
 lookupIp("localhost", localIp, sizeof localIp);
