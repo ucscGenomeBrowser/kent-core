@@ -1527,6 +1527,7 @@ return hubName;
 static char *vettedTracks[] =
 /* tracks that have been tested with quickLift */
 {
+"decipherContainer",
 "decipherSnvs",
 "omimLocation",
 "omimAvSnp",
@@ -1543,6 +1544,8 @@ static char *vettedTracks[] =
 static boolean isVetted(char *track)
 /* Is this a track that's been tested with quickLift?  If not we don't want to do the special name handling on the track. */
 {
+if (startsWith("wgEncodeGencode", track))
+    return TRUE;
 static bool inited = FALSE;
 static struct hash *vettedHash = NULL;
 
@@ -1693,7 +1696,8 @@ return dy;
 static boolean validateOneTdb(char *db, struct trackDb *tdb, struct trackDb **badList)
 /* Make sure the tdb is a track type we grok. */
 {
-if (sameString("cytoBandIdeo", tdb->track) || !( startsWith("bigBed", tdb->type) || \
+if (sameString("cytoBandIdeo", tdb->track) || 
+    !( startsWith("bigBed", tdb->type) || \
        startsWith("bigWig", tdb->type) || \
        startsWith("bigDbSnp", tdb->type) || \
        startsWith("bigGenePred", tdb->type) || \
@@ -1704,7 +1708,7 @@ if (sameString("cytoBandIdeo", tdb->track) || !( startsWith("bigBed", tdb->type)
        sameString("bed", tdb->type) ||
        startsWith("bed ", tdb->type)))
     {
-    printf("%s %s<BR>\n",tdb->track,tdb->type);
+    slAddHead(badList, tdb);
     return FALSE;
     }
 
@@ -1809,9 +1813,12 @@ static void walkTree(FILE *f, char *db, struct cart *cart,  struct trackDb *tdb,
 {
 unsigned priority = 1;
 struct hash *haveSuper = newHash(0);
+struct trackDb *tdbNext = NULL;
 
-for(; tdb; tdb = tdb->next)
+for(; tdb; tdb = tdbNext)
     {
+    tdbNext = tdb->next;
+
     boolean isVisible =  FALSE;
 
     if (tdb->parent == NULL)

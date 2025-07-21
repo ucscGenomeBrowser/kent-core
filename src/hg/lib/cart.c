@@ -1472,7 +1472,7 @@ boolean isValidToken(char *token)
     safef(data, sizeof(data), "secret=%s&response=%s", secret, token);
     char *reply = curlPostUrl(url, data);
 
-    boolean res = startsWith("{\"success\":true", reply);
+    boolean res = strstr(reply, "\"success\":true") != NULL;
     freez(&reply);
     return res;
 }
@@ -1528,7 +1528,7 @@ for (struct slName *sl = excStrs;  sl != NULL;  sl = sl->next)
     {
     if (regexMatch(agent, sl->name))
         {
-        fprintf(stderr, "CAPTCHAPASS %s\n", agent);
+        fprintf(stderr, "CAPTCHAPASS %s matches %s\n", agent, sl->name);
         return TRUE;
         }
     }
@@ -1537,9 +1537,17 @@ return FALSE;
 }
 
 void forceUserIdOrCaptcha(struct cart* cart, char *userId, boolean userIdFound, boolean fromCommandLine)
-/* print captcha is user did not sent a valid hguid cookie or a valid
+/* print captcha if user did not sent a valid hguid cookie or a valid
  * cloudflare token. Allow certain IPs and user-agents. */
 {
+static boolean captchaCheckDone = FALSE;
+
+// No need to do this again. Can happen if cartNew() is called somewhere else in a CGI
+if (captchaCheckDone)
+    return;
+
+captchaCheckDone = TRUE;
+
 if (fromCommandLine || isEmpty(cfgOption(CLOUDFLARESITEKEY)))
     return;
 
@@ -1547,7 +1555,15 @@ if (fromCommandLine || isEmpty(cfgOption(CLOUDFLARESITEKEY)))
 if (botException())
     return;
 
+// certain user agents are allowed to use the website without a captcha
 if (isUserAgentException())
+    return;
+
+// hgRenderTracks should not show the captcha - it was made to be used from other websites
+// For hgSession, we redirect from euro and asia to the RR - avoid showing the captcha there
+// hgLogin is the redirect target for hgSession, so avoid it there as well
+char *cgi = cgiScriptName();
+if ( sameWord(cgi, "/cgi-bin/hgRenderTracks") || sameWord(cgi, "/cgi-bin/hgSession") || sameWord(cgi, "/cgi-bin/hgLogin") )
     return;
 
 // Do not show a captcha if we have a valid cookie 
@@ -1559,10 +1575,25 @@ if (userId && userIdFound && !cgiOptionalString("captcha"))
 // After the reload, the new page URL has the captcha token in the URL argument list, so now we need to validate it
 // and remove it from the cart
 char *token = cgiOptionalString("token");
-if (token && isValidToken(token))
-{
-    cartRemove(cart, "token");
-    return;
+if (token)
+{ 
+    if (isValidToken(token))
+        {
+        cartRemove(cart, "token");
+        return;
+        }
+    else
+        {
+        puts("Content-Type: text/html\n");
+        puts("<html><body>Internal captcha error: Cloudflare rejected the captcha token. "
+                "Something is not working internally, we are very sorry. You can try reloading the page. "
+                "If this problem persists, send an email to genome-www@soe.ucsc.edu and we will "
+                "look into it as quickly as we can in the PST timezone. You can use any internet browser "
+                "where you have used the genome browser before, but not from this internet browser. "
+                "You can try our mirror sites, "
+                "genome-euro.ucsc.edu or genome-asia.ucsc.edu, while we are working on a solution.</body></html>");
+        exit(0);
+        }
 }
 
 printCaptcha();
@@ -1570,11 +1601,18 @@ printCaptcha();
 
 void cartRemove(struct cart *cart, char *var);
 
-struct cart *cartNew(char *userId, char *sessionId,
-                     char **exclude, struct hash *oldVars)
-/* Load up cart from user & session id's.  Exclude is a null-terminated list of
- * strings to not include */
+static void genericCgiSetup()
+/* Run steps that all CGIs must do that unrelated to the cart: timeout, logging setup, UDC.
+ */
 {
+static boolean genericSetupDone = FALSE;
+
+// do this only once per execution
+if (genericSetupDone)
+    return;
+
+genericSetupDone = TRUE;
+
 cgiApoptosisSetup();
 if (cfgOptionBooleanDefault("showEarlyErrors", FALSE))
     errAbortSetDoContentType(TRUE);
@@ -1585,6 +1623,14 @@ if (cfgOptionBooleanDefault("suppressVeryEarlyErrors", FALSE))
 setUdcCacheDir();
 
 netSetTimeoutErrorMsg("A connection timeout means that either the server is offline or its firewall, the UCSC firewall or any router between the two blocks the connection.");
+}
+
+struct cart *cartNew(char *userId, char *sessionId,
+                     char **exclude, struct hash *oldVars)
+/* Load up cart from user & session id's.  Exclude is a null-terminated list of
+ * strings to not include */
+{
+genericCgiSetup();
 
 struct cart *cart;
 struct sqlConnection *conn = cartDefaultConnector();
@@ -1607,21 +1653,6 @@ forceUserIdOrCaptcha(cart, userId, userIdFound, fromCli);
 // we rely on the cookie being validated, so if we reset a cookie, do this after the captcha
 if ( cgiOptionalString("ignoreCookie") != NULL )
     cart->userInfo = loadDb(conn, userDbTable(), NULL, &userIdFound);
-
-// Leaving this in the code temporarily, until June 2025 release.
-if (!fromCli && 
-    ((sessionId && !sessionIdFound) || !sessionId) && 
-    (!userId || !userIdFound) && 
-    cfgOptionBooleanDefault("punishInvalidHgsid", FALSE))
-    {
-    fprintf(stderr, "HGSID_WAIT no sessionId and no cookie: 5 seconds penalty");
-    sleep(5);
-    if (sessionId && !sessionIdFound)
-        {
-        fprintf(stderr, "HGSID_WAIT2 sessionId sent but invalid: 10 seconds penalty");
-        sleep(10);
-        }
-    }
 
 if (sessionIdFound)
     cartParseOverHash(cart, cart->sessionInfo->contents);
