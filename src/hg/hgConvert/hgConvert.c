@@ -25,6 +25,7 @@
 #include "trackHub.h"
 #include "hubConnect.h"
 #include "quickLift.h"
+#include "chromAlias.h"
 
 
 /* CGI Variables */
@@ -64,9 +65,9 @@ static void askForDestination(struct liftOverChain *liftOver, char *fromPos,
 {
 struct dbDb *dbList;
 boolean askAboutQuickLift = FALSE;
-boolean quickLiftChainExists =  (quickLiftGetChain(fromDb->name, toDb->name) != 0);
+//boolean quickLiftChainExists =  (quickLiftGetChain(fromDb->name, toDb->name) != 0);
 
-if (quickLiftEnabled() && quickLiftChainExists)
+if (quickLiftEnabled())
     askAboutQuickLift = TRUE;
 
 cartWebStart(cart, database, "Convert %s to New Assembly", fromPos);
@@ -285,13 +286,18 @@ static void doConvert(char *fromPos)
 struct dbDb *fromDb = hDbDb(trackHubSkipHubName(database)), *toDb = hDbDb(cartString(cart, HGLFT_TODB_VAR));
 
 if (fromDb == NULL)
-    fromDb =  genarkLiftOverDbs(database);
+    {
+    char buffer[4096];
+    safef(buffer, sizeof buffer, "'%s'", trackHubSkipHubName(database));
+    fromDb =  genarkLiftOverDbs(buffer);
+    }
 if (toDb == NULL)
     toDb =  genarkLiftOverDb(cartString(cart, HGLFT_TODB_VAR));
 
 if (!fromDb || !toDb)
     errAbort("Early error - unable to find matching database records in dbDb - please contact support");
 
+chromAliasSetup(database);
 cartWebStart(cart, database, "%s %s %s to %s %s", fromDb->organism, fromDb->description,
 	fromPos, toDb->organism, toDb->description);
 
@@ -364,29 +370,15 @@ else
            browser for toDb, otherwise just print position without link. */
         boolean startedAnchor = FALSE;
         visDy = newDyString(20);
-        if ((hDbIsActive(toDb->name) && chromSeqExists) || startsWith("hub:",toDb->nibPath))
+        if ((hDbIsActive(toDb->name) && chromSeqExists) || startsWith("hub:",toDb->nibPath) || sameString(toDb->nibPath, "genark"))
             {
             if (quickChain)
-                printf("<A HREF=\"%s?hgsid=%s&db=%s&position=%s:%d-%d&quickLift.%d.%s=%d\">",
-                   hgTracksName(), cartSessionId(cart), toDb->name,  chain->qName, qStart+1, qEnd, quickHub, toDb->name, quickChain);
+                printf("<A HREF=\"%s?db=%s&position=%s:%d-%d&quickLift.%d.%s=%d\">",
+                   hgTracksName(),  toDb->name,  chain->qName, qStart+1, qEnd, quickHub, toDb->name, quickChain);
             else
-                printf("<A HREF=\"%s?hgsid=%s&db=%s&position=%s:%d-%d\">",
-		   hgTracksName(), cartSessionId(cart), toDb->name, chain->qName, qStart+1, qEnd);
+                printf("<A HREF=\"%s?db=%s&position=%s:%d-%d\">",
+		   hgTracksName(), toDb->name, chain->qName, qStart+1, qEnd);
             startedAnchor = TRUE;
-            }
-        else if (sameString(toDb->nibPath, "genark"))
-            {
-            char *hubUrl = genarkUrl(toDb->name);
-            if (hubUrl)
-                {
-                startedAnchor = TRUE;
-                if (quickChain)
-                    printf("<A HREF=\"%s?hgsid=%s&genome=%s&hubUrl=%s&position=%s:%d-%d&quickLift.%d.%s=%d\">",
-                       hgTracksName(), cartSessionId(cart), toDb->name, hubUrl, chain->qName, qStart+1, qEnd, quickHub, toDb->name, quickChain);
-                else
-                    printf("<A HREF=\"%s?hgsid=%s&genome=%s&hubUrl=%s&position=%s:%d-%d\">",
-                       hgTracksName(), cartSessionId(cart), toDb->name, hubUrl, chain->qName, qStart+1, qEnd);
-                }
             }
 	printf("%s:%d-%d",  chain->qName, qStart+1, qEnd);
         if (startedAnchor)
@@ -447,7 +439,7 @@ else
     {
     struct liftOverChain *checkLiftOverList = liftOverChainListForDbFiltered(trackHubSkipHubName(database));
     struct liftOverChain *liftOverList = cleanLiftOverList(checkLiftOverList);
-    struct liftOverChain *choice = defaultChoices(liftOverList, organism, database);
+    struct liftOverChain *choice = defaultChoices(liftOverList, organism, trackHubSkipHubName(database));
     if (choice == NULL)
 	errAbort("Sorry, no conversions available from this assembly.");
     struct dbDb *dbList, *fromDb, *toDb;
