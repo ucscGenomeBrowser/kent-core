@@ -177,7 +177,7 @@ dnaUtilOpen();
 if (withHttpHeader)
     {
     char *cookieName = hUserCookie();
-    cartWriteHeaderAndCont(theCart, cookieName);
+    cartWriteHeaderAndCont(theCart, cookieName, NULL);
     }
 
 // If the database name is not already in the title string, add it now
@@ -494,7 +494,7 @@ static void webStartGbOptionalBanner(struct cart *cart, char *db, char *title, b
  */
 {
 char *cookieName = hUserCookie();
-cartWriteHeaderAndCont(cart, cookieName);
+cartWriteHeaderAndCont(cart, cookieName, NULL);
 
 char *csp = getCspMetaHeader();
 if (hgGateway)
@@ -705,7 +705,7 @@ char *cgiName;
 for (cur = dbList; cur != NULL; cur = cur->next)
     {
     if (!hashFindVal(hash, cur->genome) &&
-	(!doCheck || hDbExists(cur->name)))
+	(!doCheck || hDbExists(cur->name) || startsWith("GC", cur->name)))
         {
         hashAdd(hash, cur->genome, cur);
         orgList[numGenomes] = trackHubSkipHubName(cur->genome);

@@ -1114,6 +1114,13 @@ return ci->size;
 void hNibForChrom(char *db, char *chromName, char retNibName[HDB_MAX_PATH_STRING])
 /* Get .nib file associated with chromosome. */
 {
+if (startsWith("GC", db))
+    {
+    struct trackHubGenome *genome = trackHubGetGenome(db);
+    if (genome->twoBitPath)
+        safef(retNibName, HDB_MAX_PATH_STRING, "%s", genome->twoBitPath);
+    return;
+    }
 if (cfgOptionBooleanDefault("forceTwoBit", TRUE) == TRUE && !trackHubDatabase(db))
     {
     char buf[HDB_MAX_PATH_STRING];
@@ -2918,6 +2925,28 @@ const struct dbDb *b = *((struct dbDb **)vb);
 if (b->orderKey > a->orderKey) return -1;
 else if (b->orderKey < a->orderKey) return 1;
 else return 0;
+}
+
+static int hDbDbCmpName(const void *va, const void *vb)
+/* Compare to sort based on organism */
+{
+const struct dbDb *a = *((struct dbDb **)va);
+const struct dbDb *b = *((struct dbDb **)vb);
+
+// put Human at top followed by Mouse and then alphabetically with "Other" at the bottom
+if (sameString(a->genome, "Human"))
+    return -1;
+if (sameString(b->genome, "Human"))
+    return 1;
+if (sameString(a->genome, "Mouse"))
+    return -1;
+if (sameString(b->genome, "Mouse"))
+    return 1;
+if (sameString(a->genome, "Other"))
+    return 1;
+if (sameString(b->genome, "Other"))
+    return -1;
+return strcmp(a->genome, b->genome);
 }
 
 struct slName *hDbList()
@@ -4983,7 +5012,7 @@ if (cfgOptionBooleanDefault("genarkLiftOver", FALSE) && (strlen(dy->string) > 0)
     {
     dy->string[strlen(dy->string) - 1] = 0;
     struct dbDb *genarkDbDbs = genarkLiftOverDbs(dy->string);
-    liftOverDbList = slCat(genarkDbDbs, liftOverDbList);
+    liftOverDbList = slCat(liftOverDbList, genarkDbDbs);
     }
 
 hashFree(&hash);
@@ -4992,7 +5021,7 @@ liftOverChainFreeList(&chainList);
 
 /* sort by orderKey so that assemblies always appear from most recent */
 /* to the oldest assemblies in the dropdown menu for fromDbs */
-slSort(&liftOverDbList, hDbDbCmpOrderKey);
+slSort(&liftOverDbList, hDbDbCmpName);
 
 return liftOverDbList;
 }
@@ -5043,7 +5072,7 @@ if (cfgOptionBooleanDefault("genarkLiftOver", FALSE) && (strlen(dy->string) > 0)
     {
     dy->string[strlen(dy->string) - 1] = 0;
     struct dbDb *genarkDbDbs = genarkLiftOverDbs(dy->string);
-    liftOverDbList = slCat(genarkDbDbs, liftOverDbList);
+    liftOverDbList = slCat(liftOverDbList, genarkDbDbs);
     }
 
 hashFree(&hash);
@@ -5051,7 +5080,7 @@ liftOverChainFreeList(&chainList);
 
 /* sort by orderKey so that assemblies always appear from most recent */
 /* to the oldest assemblies in the dropdown menu for toDbs */
-slSort(&liftOverDbList, hDbDbCmpOrderKey);
+slSort(&liftOverDbList, hDbDbCmpName);
 return liftOverDbList;
 }
 

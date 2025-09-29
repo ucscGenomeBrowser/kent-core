@@ -27,6 +27,7 @@
 #include "genark.h"
 #include "asmAlias.h"
 #include "cheapcgi.h"
+#include "quickLift.h"
 
 boolean hubsCanAddGroups()
 /* can track hubs have their own groups? */
@@ -307,6 +308,16 @@ slReverse(&hubList);
 return hubList;
 }
 
+void removeQuickListReference(struct cart *cart, unsigned hubId, char *toDb)
+{
+// for now we're deleting quickLifted ups that aren't to the current datbase
+char buffer[4096];
+
+safef(buffer, sizeof buffer, "quickLift.%d.%s", hubId, toDb);
+cartRemove(cart, buffer);
+cartSetString(cart, hgHubConnectRemakeTrackHub, "on");
+}
+
 struct hubConnectStatus *hubConnectStatusListFromCart(struct cart *cart, char *db)
 /* Return list of track hubs that are turned on by user in cart. */
 {
@@ -328,7 +339,7 @@ for (name = nameList; name != NULL; name = name->next)
     else
         {
         char query[4096];
-        sqlSafef(query, sizeof(query), "select fromDb, toDb, path from %s where id = \"%s\"", "quickLiftChain", colon);
+        sqlSafef(query, sizeof(query), "select fromDb, toDb, path from %s where id = \"%s\"", quickLiftChainTable(), colon);
         struct sqlResult *sr = sqlGetResult(conn, query);
         char **row;
         char *replaceDb = NULL;
@@ -347,14 +358,7 @@ for (name = nameList; name != NULL; name = name->next)
         if ((db == NULL) || sameOk(toDb, hubConnectSkipHubPrefix(db)))
             hub = hubConnectStatusForIdExt(conn, id, replaceDb, toDb, quickLiftChain);
         else
-            {
-            // for now we're deleting quickLifted ups that aren't to the current datbase
-            char buffer[4096];
-
-            safef(buffer, sizeof buffer, "quickLift.%d.%s", id, toDb);
-            cartRemove(cart, buffer);
-            cartSetString(cart, hgHubConnectRemakeTrackHub, "on");
-            }
+            removeQuickListReference(cart, id, toDb);
         }
     if (hub != NULL)
 	{
@@ -515,14 +519,25 @@ for(tdb = tdbList; tdb; tdb = tdb->next)
 }
 
 // a string to define trackDb for quickLift chain
-static char *chainTdbString = 
-    "shortLabel chain to %s\n"
-    "longLabel chain to %s\n"
+char *chainTdbString = 
+    "shortLabel %s Chain\n"
+    "longLabel %s Chain\n"
     "type bigChain %s\n"
+    "bigDataUrl %s\n"
+    "quickLiftUrl %s\n"
+    "quickLiftDb %s\n"
+    "otherTwoBitUrl %s\n";
+
+// a string to define trackDb for quickLift chain
+char *controlTdbString = 
+    "shortLabel Warnings %s\n"
+    "longLabel Warnings %s\n"
+    "type bigQuickLiftChain %s\n"
     "chainType reverse\n"
     "bigDataUrl %s\n"
     "quickLiftUrl %s\n"
-    "quickLiftDb %s\n";
+    "quickLiftDb %s\n"
+    "otherTwoBitUrl %s\n";
 
 static struct trackDb *makeQuickLiftChainTdb(struct trackHubGenome *hubGenome,  struct hubConnectStatus *hub)
 // make a trackDb entry for a quickLift chain
@@ -534,7 +549,9 @@ AllocVar(tdb);
 char buffer[4096];
 safef(buffer, sizeof buffer, "hub_%d_quickLiftChain", hub->id);
 tdb->table = tdb->track = cloneString(buffer);
-safef(buffer, sizeof buffer, chainTdbString, hubGenome->quickLiftDb, hubGenome->quickLiftDb, hubGenome->quickLiftDb, hubGenome->quickLiftChain, hubGenome->quickLiftChain, hubGenome->quickLiftDb);
+char otherTwoBitFile[4096];
+hNibForChrom(hubGenome->quickLiftDb, NULL, otherTwoBitFile);
+safef(buffer, sizeof buffer, controlTdbString, hubGenome->quickLiftDb, hubGenome->quickLiftDb, hubGenome->quickLiftDb, hubGenome->quickLiftChain, hubGenome->quickLiftChain, hubGenome->quickLiftDb, otherTwoBitFile);
 tdb->settings = cloneString(buffer);
 tdb->settingsHash = trackDbSettingsFromString(tdb, buffer);
 trackDbFieldsFromSettings(tdb);

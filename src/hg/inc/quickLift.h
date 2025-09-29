@@ -8,6 +8,34 @@
 
 #define quickLiftCartName     "hubQuickLift"
 
+#define quickLiftChainTableConfVariable      "quickLiftChainName"
+#define defaultQuickLiftChainTableName       "quickLiftChain"
+
+struct quickLiftRegions
+// store highlight information
+{
+struct quickLiftRegions *next;
+unsigned type;
+char *chrom;
+long chromStart;
+long chromEnd;
+char *bases;
+unsigned baseCount;
+char *oChrom;
+long oChromStart;
+long oChromEnd;
+char *otherBases;
+unsigned otherBaseCount;
+char * id;
+};
+
+#define QUICKTYPE_INSERT     0
+#define QUICKTYPE_DEL      1
+#define QUICKTYPE_DOUBLE     2
+#define QUICKTYPE_MISMATCH     3
+
+extern char *quickTypeStrings[];
+
 typedef struct slList *(*ItemLoader2)(char **row, int numFields);
 /* Load a bed file from an SQL query result. */
 
@@ -33,4 +61,10 @@ struct bed *quickLiftBeds(struct bed *bedList, struct hash *chainHash, boolean b
 
 boolean quickLiftEnabled();
 /* Return TRUE if feature is available */
+
+struct quickLiftRegions *quickLiftGetRegions(char *ourDb, char *liftDb, char *quickLiftFile, char *chrom, int seqStart, int seqEnd);
+/* Figure out the highlight regions and cache them. */
+
+char *quickLiftChainTable();
+/* Return the name of the quickLiftChain table. */
 #endif

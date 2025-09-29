@@ -137,8 +137,8 @@ double score = 0;
 char *chainFromOrg = hOrganism(chain->fromDb);
 char *chainToOrg = hOrganism(chain->toDb);
 int fromRank = hashIntValDefault(dbRank, chain->fromDb, 0);
-int toRank = hashIntValDefault(dbRank, chain->toDb, 0);
 int maxRank = hashIntVal(dbRank, "maxRank");
+int toRank = hashIntValDefault(dbRank, chain->toDb, maxRank);
 
 if (sameOk(fromOrg,chainFromOrg) &&
     sameOk(fromDb,chain->fromDb) &&
@@ -156,8 +156,9 @@ if (sameOk(toOrg,chainToOrg))
 if (sameOk(toDb,chain->toDb))
     score += 100000;
 
-if (toRank == 0)  // chains to db's that are not active shouldn't be considered
-    return 0;
+// at the moment we aren't ranking genark db's
+//if (toRank == 0)  // chains to db's that are not active shouldn't be considered
+    //return 0;
 score += 10*(maxRank-fromRank);
 score += (maxRank - toRank);
 
@@ -183,6 +184,11 @@ if (sameWord(toOrg,"0"))
     toOrg = NULL;
 if (sameWord(toDb,"0"))
     toDb = NULL;
+if ((toDb != NULL) && !sameOk(toOrg, hOrganism(toDb)))
+    toDb = NULL;
+
+if (toOrg == NULL)
+    toOrg = "Human";
 
 for (this = chainList; this != NULL; this = this->next)
     {
@@ -301,7 +307,7 @@ chromAliasSetup(database);
 cartWebStart(cart, database, "%s %s %s to %s %s", fromDb->organism, fromDb->description,
 	fromPos, toDb->organism, toDb->description);
 
-char *fileName = liftOverChainFile(fromDb->name, toDb->name);
+char *fileName = liftOverChainFile(trackHubSkipHubName(fromDb->name), trackHubSkipHubName(toDb->name));
 if (isEmpty(fileName))
     errAbort("Unable to find a chain file from %s to %s - please contact support", fromDb->name, toDb->name);
 
@@ -325,7 +331,7 @@ struct trackDb *badList = NULL;
 
 if (doQuickLift)
     {
-    quickChain = quickLiftGetChain(fromDb->name, toDb->name);
+    quickChain = quickLiftGetChain(trackHubSkipHubName(fromDb->name), trackHubSkipHubName(toDb->name));
 
     if (quickChain == 0)
         errAbort("can't find quickChain from %s to %s", fromDb->name, toDb->name);
@@ -411,7 +417,7 @@ struct liftOverChain *next = NULL;
 for (this = list; this != NULL; this = next)
     {
     next = this->next;
-    if (hashLookup(dbDbHash, this->toDb))
+    if (hashLookup(dbDbHash, this->toDb) || startsWith("GC", this->toDb))
         slAddHead(&cleanList, this);
     else
         liftOverChainFree(&this);
