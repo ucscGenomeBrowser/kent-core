@@ -39,6 +39,7 @@
 #include "quickLift.h"
 #include "botDelay.h"
 #include "curlWrap.h"
+#include "hubSpaceKeys.h"
 
 static char *sessionVar = "hgsid";	/* Name of cgi variable session is stored in. */
 static char *positionCgiName = "position";
@@ -1508,7 +1509,8 @@ void printCaptcha()
     puts("</head><body>");
     puts("<style>body, h1, h2, h3, h4, h5, h6  { font-family: Helvetica, Arial, sans-serif; }</style>\n");
     puts("<h4>The Genome Browser is protecting itself from bots. This will just take a few seconds.</h4>");
-    puts("<small>If you are a bot and were made for a research project, please contact us by email.</small>");
+    puts("<small>To make programmatic queries, see our FAQ: https://genome.ucsc.edu/FAQ/FAQdownloads.html#CAPTCHA.</small>");
+    puts("");
     puts("<script src='https://challenges.cloudflare.com/turnstile/v0/api.js?onload=showWidget' async defer></script>");
     puts("<div id='myWidget'></div>");
     puts("</body></html>");
@@ -1561,6 +1563,12 @@ if (botException())
 
 // certain user agents are allowed to use the website without a captcha
 if (isUserAgentException())
+    return;
+
+// a valid apiKey can always be used to get around the captcha. Note that bottlenecking is then done on the level
+// of the apiKey, if a valid apiKey has been supplied, see botDelay.c
+char *apiKey = cgiOptionalString("apiKey");
+if (apiKey && userNameForApiKey(apiKey))
     return;
 
 // hgRenderTracks should not show the captcha - it was made to be used from other websites
@@ -1626,7 +1634,7 @@ if (cfgOptionBooleanDefault("suppressVeryEarlyErrors", FALSE))
 
 setUdcCacheDir();
 
-netSetTimeoutErrorMsg("A connection timeout means that either the server is offline or its firewall, the UCSC firewall or any router between the two blocks the connection.");
+netSetTimeoutErrorMsg("Connection timeout: either the server is offline or any firewall between UCSC and the server blocks the connection.");
 }
 
 struct cart *cartNew(char *userId, char *sessionId,
@@ -2706,7 +2714,7 @@ if ( (timeStr = cgiOptionalString("_dumpCart")) != NULL)
     }
 
 // activate optional debuging output for CGIs
-verboseCgi(cartCgiUsualString(cart, "verbose", NULL));
+verboseCgi(cgiUsualString("verbose", NULL));
 
 return cart;
 }
@@ -4125,4 +4133,14 @@ void cartSetVersion(struct cart *cart, unsigned version)
 /* Set the current version of the cart, which is stored in the variable "cartVersion" */
 {
 cartSetInt(cart, "cartVersion", version);
+}
+
+char *cartOrCfgOption(struct cart *cart, char *name)
+/* Return the option with the given name. First check cart then hg.conf.  Return NULL if * it doesn't exist. */
+{
+char *str = NULL;
+if ((str = cartOptionalString(cart, name)) == NULL)
+    return str = cfgOption(name);
+
+return str;
 }
